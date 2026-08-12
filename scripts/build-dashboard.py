@@ -623,14 +623,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       </div>
 
       <div class="stats" id="stats"></div>
-
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.3-4.3"></path>
-        </svg>
-        <input id="search" class="search" type="search" placeholder="Search files, areas, hints…" aria-label="Search toasts" />
-      </div>
     </header>
 
     <div class="tabs" role="tablist" aria-label="Toast systems">
@@ -638,6 +630,14 @@ TEMPLATE = r"""<!DOCTYPE html>
       <button class="tab" role="tab" data-tab="cl" aria-selected="false">Component-library</button>
       <button class="tab" role="tab" data-tab="bn" aria-selected="false">BaseNotification</button>
       <button class="tab" role="tab" data-tab="mmds" aria-selected="false">MMDS</button>
+    </div>
+
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+      </svg>
+      <input id="search" class="search" type="search" placeholder="Search files, areas, hints…" aria-label="Search toasts" />
     </div>
 
     <hr class="separator" />
@@ -704,8 +704,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           minute: '2-digit',
         })
       : (DATA.scannedAt || 'unknown');
-    document.getElementById('meta').textContent =
-      `Source: ${DATA.sourceRepo} · last updated ${lastUpdated}`;
+    document.getElementById('meta').textContent = `Last updated ${lastUpdated}`;
 
     const s = DATA.summary;
     document.getElementById('stats').innerHTML = [
