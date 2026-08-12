@@ -495,7 +495,8 @@ TEMPLATE = r"""<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.25rem;
+      gap: 1.75rem;
+      padding-block: 0.75rem;
     }
 
     .donut {
@@ -858,8 +859,8 @@ TEMPLATE = r"""<!DOCTYPE html>
 
       const charts = [
         `<div class="charts-row">
-          ${chartCard('', '', circleChart(systemRows, { unit: 'calls' }))}
-          ${chartCard('', '', circleChart(fileRows, { unit: 'files' }))}
+          ${chartCard('Calls by system', 'Total toast / notification call sites', circleChart(systemRows, { unit: 'calls' }))}
+          ${chartCard('Files by system', 'Files that produce or host toast usage', circleChart(fileRows, { unit: 'files' }))}
         </div>`,
         chartCard('component-library files by area', 'Where Toast imports live', barChart(clAreaFiles, { fillClass: 'cl' })),
         chartCard('component-library calls by area', 'showToast / ToastService call sites', barChart(clAreaCalls, { fillClass: 'cl' })),
