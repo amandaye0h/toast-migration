@@ -42,7 +42,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       --amber: #F1BC8E;
       --cl: #8CD6E5;
       --bn: #F1BC8E;
-      --mmds: #BDA6F7;
+      --mmds: #B8A4E8;
     }
 
     * { box-sizing: border-box; }
@@ -491,10 +491,120 @@ TEMPLATE = r"""<!DOCTYPE html>
       color: var(--muted-foreground);
     }
 
+    .donut-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .donut {
+      --donut-size: 9rem;
+      width: var(--donut-size);
+      height: var(--donut-size);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background: var(--muted);
+    }
+
+    .donut-hole {
+      width: 88%;
+      height: 88%;
+      border-radius: 50%;
+      background: var(--card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--foreground) 6%, transparent);
+    }
+
+    .donut-total {
+      font-size: 1.35rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .donut-total-label {
+      font-size: 0.65rem;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .donut-legend {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      min-width: 10rem;
+      flex: 1;
+    }
+
+    .donut-legend li {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.55rem;
+      align-items: center;
+    }
+
+    .donut-swatch {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 999px;
+      background: var(--cl);
+    }
+
+    .donut-swatch.cl { background: var(--cl); }
+    .donut-swatch.bn { background: var(--bn); }
+    .donut-swatch.mmds { background: var(--mmds); }
+
+    .donut-legend-label {
+      font-size: 0.75rem;
+      color: color-mix(in oklab, var(--foreground) 82%, transparent);
+    }
+
+    .donut-legend-value {
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted-foreground);
+    }
+
     .charts {
       display: flex;
       flex-direction: column;
       gap: 1rem;
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .charts-row .chart-heading {
+      text-align: center;
+    }
+
+    .charts-row .donut-legend {
+      width: 100%;
+      max-width: none;
+      align-self: stretch;
+      min-width: 0;
+    }
+
+    @media (max-width: 720px) {
+      .charts-row {
+        grid-template-columns: 1fr;
+      }
     }
 
     .search-wrap.is-hidden { display: none; }
@@ -524,9 +634,9 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     <div class="tabs" role="tablist" aria-label="Toast systems">
       <button class="tab" role="tab" data-tab="overview" aria-selected="true">Overview</button>
-      <button class="tab" role="tab" data-tab="cl" aria-selected="false">Component-library Toast</button>
+      <button class="tab" role="tab" data-tab="cl" aria-selected="false">Component-library</button>
       <button class="tab" role="tab" data-tab="bn" aria-selected="false">BaseNotification</button>
-      <button class="tab" role="tab" data-tab="mmds" aria-selected="false">MMDS Toast</button>
+      <button class="tab" role="tab" data-tab="mmds" aria-selected="false">MMDS</button>
     </div>
 
     <hr class="separator" />
@@ -652,12 +762,44 @@ TEMPLATE = r"""<!DOCTYPE html>
         </div>`).join('')}</div>`;
     }
 
+    const FILL_COLORS = { cl: 'var(--cl)', bn: 'var(--bn)', mmds: 'var(--mmds)' };
+
+    function circleChart(rows, { unit = '' } = {}) {
+      if (!rows.length) return '<p class="empty">No data.</p>';
+      const total = rows.reduce((sum, r) => sum + (r.value || 0), 0);
+      let cursor = 0;
+      const stops = rows.map((r) => {
+        const fill = FILL_COLORS[r.fillClass] || 'var(--cl)';
+        const start = total ? (cursor / total) * 100 : 0;
+        cursor += r.value || 0;
+        const end = total ? (cursor / total) * 100 : 0;
+        return `${fill} ${start}% ${end}%`;
+      });
+      const gradient = total
+        ? `conic-gradient(from -90deg, ${stops.join(', ')})`
+        : 'var(--muted)';
+      return `<div class="donut-layout">
+        <div class="donut" style="background:${gradient}" role="img" aria-label="${esc(unit || 'total')}: ${total}">
+          <div class="donut-hole">
+            <div class="donut-total">${total}</div>
+            ${unit ? `<div class="donut-total-label">${esc(unit)}</div>` : ''}
+          </div>
+        </div>
+        <ul class="donut-legend">${rows.map((r) => `
+          <li title="${esc(r.label)}: ${r.value}">
+            <span class="donut-swatch ${esc(r.fillClass || 'cl')}"></span>
+            <span class="donut-legend-label">${esc(r.label)}</span>
+            <span class="donut-legend-value">${r.value}</span>
+          </li>`).join('')}</ul>
+      </div>`;
+    }
+
     function chartCard(title, subtitle, body) {
       return `<article class="chart-card">
-        <div class="chart-heading">
+        ${title ? `<div class="chart-heading">
           <h2 class="chart-title">${esc(title)}</h2>
           ${subtitle ? `<p class="chart-subtitle">${esc(subtitle)}</p>` : ''}
-        </div>
+        </div>` : ''}
         ${body}
       </article>`;
     }
@@ -715,8 +857,10 @@ TEMPLATE = r"""<!DOCTYPE html>
         }));
 
       const charts = [
-        chartCard('Calls by system', 'Total toast / notification call sites', barChart(systemRows)),
-        chartCard('Files by system', 'Files that produce or host toast usage', barChart(fileRows)),
+        `<div class="charts-row">
+          ${chartCard('', '', circleChart(systemRows, { unit: 'calls' }))}
+          ${chartCard('', '', circleChart(fileRows, { unit: 'files' }))}
+        </div>`,
         chartCard('component-library files by area', 'Where Toast imports live', barChart(clAreaFiles, { fillClass: 'cl' })),
         chartCard('component-library calls by area', 'showToast / ToastService call sites', barChart(clAreaCalls, { fillClass: 'cl' })),
         chartCard('BaseNotification calls by area', 'NotificationManager producer call sites', barChart(bnAreaCalls, { fillClass: 'bn' })),
