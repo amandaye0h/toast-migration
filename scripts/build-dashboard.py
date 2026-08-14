@@ -154,17 +154,12 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     .list-toolbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 0.75rem;
       position: relative;
       z-index: 2;
-    }
-
-    .search-wrap {
-      position: relative;
-      min-width: 0;
     }
 
     .toolbar-filters {
@@ -188,10 +183,6 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     @media (max-width: 640px) {
-      .list-toolbar {
-        grid-template-columns: 1fr;
-      }
-
       .toolbar-filters {
         width: 100%;
       }
@@ -207,6 +198,30 @@ TEMPLATE = r"""<!DOCTYPE html>
         min-width: 0;
         max-width: none;
       }
+    }
+
+    .reset-btn {
+      height: 2rem;
+      padding: 0 0.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--input);
+      background: color-mix(in oklab, var(--input) 30%, transparent);
+      color: var(--foreground);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+    }
+
+    .reset-btn:hover {
+      background: color-mix(in oklab, var(--muted) 50%, transparent);
+    }
+
+    .reset-btn:focus-visible {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
     }
 
     .ui-select {
@@ -307,38 +322,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       border-radius: 999px;
       flex-shrink: 0;
       background: var(--owner-color, var(--muted-foreground));
-    }
-
-    .search-wrap svg {
-      position: absolute;
-      top: 50%;
-      left: 0.625rem;
-      width: 1rem;
-      height: 1rem;
-      transform: translateY(-50%);
-      color: var(--muted-foreground);
-      pointer-events: none;
-    }
-
-    .search {
-      width: 100%;
-      height: 2rem;
-      border-radius: var(--radius);
-      border: 1px solid var(--input);
-      background: color-mix(in oklab, var(--input) 30%, transparent);
-      color: var(--foreground);
-      font: inherit;
-      font-size: 0.875rem;
-      padding: 0.25rem 0.625rem 0.25rem 2rem;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    .search::placeholder { color: var(--muted-foreground); }
-
-    .search:focus-visible {
-      border-color: var(--ring);
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
     }
 
     .tabs {
@@ -476,8 +459,8 @@ TEMPLATE = r"""<!DOCTYPE html>
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 2.25rem;
-      height: 2.25rem;
+      width: 32px;
+      height: 32px;
       margin: 0;
       padding: 0;
       border: 1px solid var(--input);
@@ -829,7 +812,23 @@ TEMPLATE = r"""<!DOCTYPE html>
     .status-pr {
       margin-top: 0.2rem;
       font-size: 0.75rem;
-      color: var(--muted-foreground);
+      color: var(--foreground);
+    }
+
+    .status-pr a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    .status-pr a:hover {
+      color: var(--teal-bright);
+    }
+
+    .status-pr a:focus-visible {
+      outline: none;
+      border-radius: 2px;
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
     }
 
     .status-empty {
@@ -860,13 +859,6 @@ TEMPLATE = r"""<!DOCTYPE html>
     </div>
 
     <div class="list-toolbar">
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.3-4.3"></path>
-        </svg>
-        <input id="search" class="search" type="search" placeholder="Search files, areas, owners, hints…" aria-label="Search toasts" />
-      </div>
       <div class="toolbar-filters">
         <div class="sort-group">
           <span class="sort-label" id="sort-label">Sort</span>
@@ -898,6 +890,7 @@ TEMPLATE = r"""<!DOCTYPE html>
             <div class="ui-select-content" hidden role="listbox"></div>
           </div>
         </div>
+        <button type="button" class="reset-btn" id="reset-filters">Reset</button>
       </div>
     </div>
 
@@ -1284,12 +1277,18 @@ TEMPLATE = r"""<!DOCTYPE html>
           const label = owners.length ? ownerLabel(owners[0]) : 'unassigned';
           let row = byOwner.get(label);
           if (!row) {
-            row = { files: 0, calls: 0, prFiles: 0, owner: owners[0] || '' };
+            row = { files: 0, calls: 0, prFiles: 0, prs: [], owner: owners[0] || '' };
             byOwner.set(label, row);
           }
           row.files += 1;
           row.calls += countOf(entry) || 0;
-          if (entry.pr) row.prFiles += 1;
+          if (entry.pr) {
+            row.prFiles += 1;
+            const key = entry.pr.number || entry.pr.url;
+            if (key && !row.prs.some((p) => (p.number || p.url) === key)) {
+              row.prs.push(entry.pr);
+            }
+          }
         }
         return byOwner;
       }
@@ -1306,11 +1305,26 @@ TEMPLATE = r"""<!DOCTYPE html>
           return a.localeCompare(b);
         });
 
+      function prLink(pr, label) {
+        const title = pr.title || (pr.number ? `PR #${pr.number}` : label);
+        if (!pr.url) return esc(label);
+        return `<a href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${esc(label)}</a>`;
+      }
+
       function cell(stats) {
         if (!stats?.files) return '<span class="status-empty">—</span>';
-        const pr = stats.prFiles
-          ? `<div class="status-pr">${stats.prFiles} in PR</div>`
-          : '';
+        const prs = [...(stats.prs || [])].sort((a, b) => (a.number || 0) - (b.number || 0));
+        let pr = '';
+        if (stats.prFiles) {
+          if (prs.length === 1) {
+            pr = `<div class="status-pr">${prLink(prs[0], `${stats.prFiles} in PR`)}</div>`;
+          } else if (prs.length > 1) {
+            const links = prs.map((p) => prLink(p, p.number ? `#${p.number}` : 'PR')).join(' · ');
+            pr = `<div class="status-pr">${stats.prFiles} in PR ${links}</div>`;
+          } else {
+            pr = `<div class="status-pr">${stats.prFiles} in PR</div>`;
+          }
+        }
         return `<div class="status-nums">${stats.files} file${stats.files === 1 ? '' : 's'} · ${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>${pr}`;
       }
 
@@ -1574,7 +1588,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       }
     });
 
-    const search = document.getElementById('search');
     const listToolbar = document.querySelector('.list-toolbar');
 
     function collectOwnerLabels() {
@@ -1623,18 +1636,15 @@ TEMPLATE = r"""<!DOCTYPE html>
     });
 
     function applyFilter() {
-      const q = search.value.trim().toLowerCase();
       const owner = ownerSelect?.getValue() || '';
       const prStatus = prSelect?.getValue() || '';
       document.querySelectorAll('.card[data-hay]').forEach((card) => {
-        const hayOk = !q || card.dataset.hay.includes(q);
         const owners = (card.dataset.owners || '').split(/\s+/).filter(Boolean);
         const ownerOk = !owner || owners.includes(owner);
         const prOk = !prStatus || card.dataset.prStatus === prStatus;
-        card.classList.toggle('hidden', !(hayOk && ownerOk && prOk));
+        card.classList.toggle('hidden', !(ownerOk && prOk));
       });
     }
-    search.addEventListener('input', applyFilter);
 
     function applySort(dir) {
       const tab = document.querySelector('.tab[aria-selected="true"]')?.dataset.tab;
@@ -1654,6 +1664,21 @@ TEMPLATE = r"""<!DOCTYPE html>
       ],
       value: 'desc',
       onChange: applySort,
+    });
+
+    document.getElementById('reset-filters')?.addEventListener('click', () => {
+      ownerSelect?.setValue('');
+      prSelect?.setValue('');
+      sortState.cl = 'desc';
+      sortState.bn = 'desc';
+      sortState.mmds = 'desc';
+      const tab = document.querySelector('.tab[aria-selected="true"]')?.dataset.tab;
+      if (tab && tab !== 'overview' && tab !== 'status') {
+        applySort('desc');
+        return;
+      }
+      sortSelect?.setValue('desc');
+      applyFilter();
     });
 
     function setTab(selected) {
@@ -1679,20 +1704,12 @@ TEMPLATE = r"""<!DOCTYPE html>
     setTab('status');
 
     window.addEventListener('keydown', (event) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === '/') {
-        event.preventDefault();
-        if (!listToolbar?.classList.contains('is-hidden')) {
-          search.focus();
-          search.select();
-        }
-      }
       if (event.key === 'Escape') {
         document.querySelectorAll('.ui-select[data-open]').forEach((root) => {
           root.removeAttribute('data-open');
           root.querySelector('.ui-select-content')?.setAttribute('hidden', '');
           root.querySelector('.ui-select-trigger')?.setAttribute('aria-expanded', 'false');
         });
-        if (document.activeElement === search) search.blur();
       }
     });
   </script>
