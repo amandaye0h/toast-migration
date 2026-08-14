@@ -1,17 +1,16 @@
 {
   "sourceRepo": "metamask-mobile",
   "sourcePath": "/Users/amanda/Documents/metamask-mobile/app",
-  "scannedAt": "2026-08-14T19:38:30",
+  "scannedAt": "2026-08-14T20:34:49",
   "summary": {
-    "componentLibraryToastFiles": 80,
-    "componentLibraryToastCalls": 112,
+    "componentLibraryToastFiles": 77,
+    "componentLibraryToastCalls": 104,
     "componentLibraryByArea": {
       "UI/Card": 12,
       "UI/Predict": 10,
       "UI/Perps": 6,
       "UI/Rewards": 4,
       "UI/QuickBuy": 4,
-      "UI/Assets": 3,
       "Views/confirmations": 3,
       "UI/HardwareWallet": 3,
       "Nav/App": 3,
@@ -20,8 +19,8 @@
       "Nav/Main": 2,
       "Views/Notifications": 2,
       "Views/SocialLeaderboard": 2,
-      "Views/AddAsset": 1,
       "UI/AssetOverview": 1,
+      "UI/Assets": 1,
       "UI/CollectibleDetectionModal": 1,
       "UI/Earn": 1,
       "UI/MarketInsights": 1,
@@ -46,10 +45,12 @@
     "baseNotificationConsumerFiles": 4,
     "baseNotificationProducerFiles": 15,
     "baseNotificationProducerCalls": 23,
-    "mmdsToastFiles": 4,
-    "mmdsToastCalls": 3,
+    "mmdsToastFiles": 7,
+    "mmdsToastCalls": 11,
     "mmdsByArea": {
       "Views/MultichainAccounts": 3,
+      "UI/Assets": 2,
+      "Views/AddAsset": 1,
       "Nav/App": 1
     }
   },
@@ -136,38 +137,6 @@
       ],
       "codeowners": [
         "@MetaMask/predict"
-      ]
-    },
-    {
-      "file": "app/components/UI/Assets/PriceAlerts/Views/ManagePriceAlertsView/ManagePriceAlertsView.tsx",
-      "area": "UI/Assets",
-      "role": "consumer",
-      "via": "import",
-      "callCount": 4,
-      "calls": [
-        {
-          "line": 133,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "price_alerts.fetch_error"
-        },
-        {
-          "line": 227,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "price_alerts.delete_success"
-        },
-        {
-          "line": 238,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "price_alerts.delete_error"
-        },
-        {
-          "line": 308,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "price_alerts.toggle_error"
-        }
-      ],
-      "codeowners": [
-        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -397,28 +366,6 @@
       ]
     },
     {
-      "file": "app/components/UI/Assets/PriceAlerts/hooks/useAlertSaveFlow.ts",
-      "area": "UI/Assets",
-      "role": "consumer",
-      "via": "import",
-      "callCount": 2,
-      "calls": [
-        {
-          "line": 77,
-          "code": "toastRef?.current?.showToast({",
-          "hint": ""
-        },
-        {
-          "line": 93,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "price_alerts.save_error"
-        }
-      ],
-      "codeowners": [
-        "@MetaMask/metamask-assets"
-      ]
-    },
-    {
       "file": "app/components/UI/Card/Views/CardHome/hooks/useCardProvisioning.ts",
       "area": "UI/Card",
       "role": "consumer",
@@ -614,28 +561,6 @@
       ],
       "codeowners": [
         "@MetaMask/rewards"
-      ]
-    },
-    {
-      "file": "app/components/Views/AddAsset/components/AddCustomCollectible/AddCustomCollectible.tsx",
-      "area": "Views/AddAsset",
-      "role": "consumer",
-      "via": "import",
-      "callCount": 2,
-      "calls": [
-        {
-          "line": 197,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "collectible.not_owner_error"
-        },
-        {
-          "line": 211,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "collectible.ownership_verification_error"
-        }
-      ],
-      "codeowners": [
-        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -1993,6 +1918,99 @@
     }
   ],
   "mmdsToasts": [
+    {
+      "file": "app/components/UI/Assets/PriceAlerts/Views/ManagePriceAlertsView/ManagePriceAlertsView.tsx",
+      "area": "UI/Assets",
+      "role": "consumer",
+      "symbols": [
+        "ToastSeverity",
+        "toast"
+      ],
+      "callCount": 4,
+      "calls": [
+        {
+          "line": 132,
+          "code": "toast({",
+          "hint": "price_alerts.fetch_error",
+          "kind": "call"
+        },
+        {
+          "line": 222,
+          "code": "toast({",
+          "hint": "price_alerts.delete_success",
+          "kind": "call"
+        },
+        {
+          "line": 231,
+          "code": "toast({",
+          "hint": "price_alerts.delete_error",
+          "kind": "call"
+        },
+        {
+          "line": 297,
+          "code": "toast({",
+          "hint": "price_alerts.toggle_error",
+          "kind": "call"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
+      ]
+    },
+    {
+      "file": "app/components/UI/Assets/PriceAlerts/hooks/useAlertSaveFlow.ts",
+      "area": "UI/Assets",
+      "role": "consumer",
+      "symbols": [
+        "ToastSeverity",
+        "toast"
+      ],
+      "callCount": 2,
+      "calls": [
+        {
+          "line": 70,
+          "code": "toast({",
+          "hint": "price_alerts.save_success",
+          "kind": "call"
+        },
+        {
+          "line": 80,
+          "code": "toast({",
+          "hint": "price_alerts.save_error",
+          "kind": "call"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
+      ]
+    },
+    {
+      "file": "app/components/Views/AddAsset/components/AddCustomCollectible/AddCustomCollectible.tsx",
+      "area": "Views/AddAsset",
+      "role": "consumer",
+      "symbols": [
+        "ToastSeverity",
+        "toast"
+      ],
+      "callCount": 2,
+      "calls": [
+        {
+          "line": 197,
+          "code": "toast({",
+          "hint": "collectible.not_owner_error_title",
+          "kind": "call"
+        },
+        {
+          "line": 207,
+          "code": "toast({",
+          "hint": "collectible.ownership_verification_error_title",
+          "kind": "call"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
+      ]
+    },
     {
       "file": "app/components/Views/MultichainAccounts/AddressList/AddressList.tsx",
       "area": "Views/MultichainAccounts",

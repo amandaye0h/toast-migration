@@ -170,6 +170,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     .toolbar-filters {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 0.75rem;
     }
 
@@ -446,6 +447,9 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     .card-title {
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-weight: 500;
       line-height: 1.35;
       word-break: break-word;
@@ -453,33 +457,18 @@ TEMPLATE = r"""<!DOCTYPE html>
       font-size: 0.8125rem;
     }
 
-    .card-body {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 0.625rem;
-      align-items: stretch;
-      min-height: 0;
-    }
-
-    .card-main {
+    .card-title-path {
+      flex: 1;
       min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
     }
 
     .card-title-actions {
       display: flex;
-      align-items: flex-start;
-      align-self: stretch;
+      align-items: center;
       flex-shrink: 0;
-      gap: 0.5rem;
+      gap: 0.375rem;
       padding-left: 0.625rem;
       border-left: 1px solid var(--border);
-    }
-
-    .card-title-actions .copy-btn {
-      margin: 0;
     }
 
     .copy-btn {
@@ -487,21 +476,22 @@ TEMPLATE = r"""<!DOCTYPE html>
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 1.5rem;
-      height: 1.5rem;
-      margin: -0.125rem 0 0;
+      width: 2.25rem;
+      height: 2.25rem;
+      margin: 0;
       padding: 0;
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) * 0.7);
-      background: transparent;
-      color: var(--muted-foreground);
+      border: 1px solid var(--input);
+      border-radius: 0.75rem;
+      background: var(--muted);
+      color: var(--foreground);
       text-decoration: none;
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
     .copy-btn:hover {
-      background: color-mix(in oklab, var(--muted) 50%, transparent);
+      background: #2b2b2b;
+      border-color: #3c3c3c;
       color: var(--foreground);
     }
 
@@ -517,8 +507,11 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     .copy-btn svg {
-      width: 0.875rem;
-      height: 0.875rem;
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .card-desc {
@@ -792,6 +785,62 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     .list-toolbar.is-hidden { display: none; }
 
+    .status-wrap {
+      overflow-x: auto;
+    }
+
+    .status-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+    }
+
+    .status-table th,
+    .status-table td {
+      padding: 0.75rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .status-table th {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+
+    .status-table th:not(:first-child),
+    .status-table td:not(:first-child) {
+      text-align: right;
+    }
+
+    .status-table tbody tr:hover th,
+    .status-table tbody tr:hover td {
+      background: color-mix(in oklab, var(--muted) 55%, transparent);
+    }
+
+    .status-owner {
+      display: flex;
+      align-items: center;
+      min-height: 1.25rem;
+    }
+
+    .status-nums {
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    .status-pr {
+      margin-top: 0.2rem;
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+    }
+
+    .status-empty {
+      color: var(--muted-foreground);
+    }
+
     [hidden] { display: none !important; }
   </style>
 </head>
@@ -808,7 +857,8 @@ TEMPLATE = r"""<!DOCTYPE html>
     </header>
 
     <div class="tabs" role="tablist" aria-label="Toast systems">
-      <button class="tab" role="tab" data-tab="cl" aria-selected="true">Component-library</button>
+      <button class="tab" role="tab" data-tab="status" aria-selected="true">Status</button>
+      <button class="tab" role="tab" data-tab="cl" aria-selected="false">Component-library</button>
       <button class="tab" role="tab" data-tab="bn" aria-selected="false">BaseNotification</button>
       <button class="tab" role="tab" data-tab="mmds" aria-selected="false">MMDS</button>
       <button class="tab" role="tab" data-tab="overview" aria-selected="false">Overview</button>
@@ -843,12 +893,40 @@ TEMPLATE = r"""<!DOCTYPE html>
             <div class="ui-select-content" hidden role="listbox"></div>
           </div>
         </div>
+        <div class="sort-group">
+          <span class="sort-label" id="pr-label">PR status</span>
+          <div class="ui-select" id="pr-select">
+            <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="pr-label">
+              <span class="ui-select-value">All</span>
+              <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="ui-select-content" hidden role="listbox"></div>
+          </div>
+        </div>
       </div>
     </div>
 
     <hr class="separator" />
 
-    <section id="panel-cl" data-panel="cl">
+    <section id="panel-status" data-panel="status">
+      <p class="note" style="margin-bottom: 0.75rem;">
+        Remaining toast work by CODEOWNERS team, for manager updates. Files already covered by an open or draft PR are listed as in PR.
+      </p>
+      <div class="status-wrap">
+        <table class="status-table" id="status-table">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Component-library</th>
+              <th>BaseNotification</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="panel-cl" data-panel="cl" hidden>
       <div class="list" style="gap: 1.5rem;">
         <div>
           <p class="note" style="margin-bottom: 0.75rem;">
@@ -1055,25 +1133,14 @@ TEMPLATE = r"""<!DOCTYPE html>
       };
     }
 
-    function fileTitle(path) {
-      return `<h3 class="card-title">${esc(path)}</h3>`;
-    }
-
-    function cardActions(path, pr) {
-      return `<span class="card-title-actions">
-        ${prStatus(pr)}
-        <button type="button" class="copy-btn" data-copy="${esc(path)}" aria-label="Copy path" title="Copy path">${COPY_ICON}</button>
-      </span>`;
-    }
-
-    function cardBody(path, pr, extra) {
-      return `<div class="card-body">
-        <div class="card-main">
-          ${fileTitle(path)}
-          ${extra || ''}
-        </div>
-        ${cardActions(path, pr)}
-      </div>`;
+    function fileTitle(path, pr) {
+      return `<h3 class="card-title">
+        <span class="card-title-path">${esc(path)}</span>
+        <span class="card-title-actions">
+          ${prStatus(pr)}
+          <button type="button" class="copy-btn" data-copy="${esc(path)}" aria-label="Copy path" title="Copy path">${COPY_ICON}</button>
+        </span>
+      </h3>`;
     }
 
     function ownerLabel(owner) {
@@ -1147,6 +1214,11 @@ TEMPLATE = r"""<!DOCTYPE html>
       return [pr.draft ? 'draft pr' : 'open pr', String(pr.number || ''), pr.title || ''];
     }
 
+    function prFilterValue(pr) {
+      if (!pr) return 'none';
+      return pr.draft ? 'draft' : 'open';
+    }
+
     function callList(calls) {
       if (!calls?.length) return '';
       return `<ul class="calls">${calls.map((c) => `
@@ -1210,6 +1282,62 @@ TEMPLATE = r"""<!DOCTYPE html>
         </div>` : ''}
         ${body}
       </article>`;
+    }
+
+    function renderStatus() {
+      function tally(entries, countOf) {
+        const byOwner = new Map();
+        for (const entry of entries || []) {
+          const owners = entry.codeowners || [];
+          const label = owners.length ? ownerLabel(owners[0]) : 'unassigned';
+          let row = byOwner.get(label);
+          if (!row) {
+            row = { files: 0, calls: 0, prFiles: 0, owner: owners[0] || '' };
+            byOwner.set(label, row);
+          }
+          row.files += 1;
+          row.calls += countOf(entry) || 0;
+          if (entry.pr) row.prFiles += 1;
+        }
+        return byOwner;
+      }
+
+      const cl = tally(DATA.componentLibraryToasts, (e) => e.callCount);
+      const bn = tally(
+        [...(DATA.baseNotificationProducers || []), ...(DATA.baseNotificationConsumers || [])],
+        (e) => e.count || e.usages?.length || 0,
+      );
+      const labels = [...new Set([...cl.keys(), ...bn.keys()])]
+        .sort((a, b) => {
+          if (a === 'unassigned') return 1;
+          if (b === 'unassigned') return -1;
+          const aCalls = (cl.get(a)?.calls || 0) + (bn.get(a)?.calls || 0);
+          const bCalls = (cl.get(b)?.calls || 0) + (bn.get(b)?.calls || 0);
+          if (bCalls !== aCalls) return bCalls - aCalls;
+          return a.localeCompare(b);
+        });
+
+      function cell(stats) {
+        if (!stats?.files) return '<span class="status-empty">—</span>';
+        const pr = stats.prFiles
+          ? `<div class="status-pr">${stats.prFiles} in PR</div>`
+          : '';
+        return `<div class="status-nums">${stats.files} file${stats.files === 1 ? '' : 's'} · ${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>${pr}`;
+      }
+
+      const body = labels.map((label) => {
+        const ownerHtml = label === 'unassigned'
+          ? ownerBadges([])
+          : ownerBadges([cl.get(label)?.owner || bn.get(label)?.owner || label]);
+        return `<tr>
+          <th scope="row"><div class="status-owner">${ownerHtml}</div></th>
+          <td>${cell(cl.get(label))}</td>
+          <td>${cell(bn.get(label))}</td>
+        </tr>`;
+      }).join('');
+
+      const tbody = document.querySelector('#status-table tbody');
+      if (tbody) tbody.innerHTML = body || '<tr><td colspan="3" class="status-empty">No CODEOWNERS data.</td></tr>';
     }
 
     function renderOverview() {
@@ -1314,13 +1442,14 @@ TEMPLATE = r"""<!DOCTYPE html>
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}" data-pr-status="${esc(prFilterValue(entry.pr))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
-            ${cardBody(entry.file, entry.pr, callList(entry.calls))}
+            ${fileTitle(entry.file, entry.pr)}
+            ${callList(entry.calls)}
           </article>`;
       }).join('');
 
@@ -1353,14 +1482,15 @@ TEMPLATE = r"""<!DOCTYPE html>
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}" data-pr-status="${esc(prFilterValue(entry.pr))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge warn">producer</span>
               <span class="badge">${entry.count} call${entry.count === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
-            ${cardBody(entry.file, entry.pr, `<ul class="calls">${hits}</ul>`)}
+            ${fileTitle(entry.file, entry.pr)}
+            <ul class="calls">${hits}</ul>
           </article>`;
       }).join('');
 
@@ -1380,13 +1510,14 @@ TEMPLATE = r"""<!DOCTYPE html>
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}" data-pr-status="${esc(prFilterValue(entry.pr))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge outline">${esc(entry.kind)}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
-            ${cardBody(entry.file, entry.pr, `<ul class="calls">${usages}</ul>`)}
+            ${fileTitle(entry.file, entry.pr)}
+            <ul class="calls">${usages}</ul>
           </article>`;
       }).join('');
 
@@ -1408,7 +1539,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}" data-pr-status="${esc(prFilterValue(entry.pr))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               ${(entry.symbols || []).map((sym) =>
@@ -1416,7 +1547,8 @@ TEMPLATE = r"""<!DOCTYPE html>
               ).join('')}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
             </div>
-            ${cardBody(entry.file, entry.pr, callList(entry.calls))}
+            ${fileTitle(entry.file, entry.pr)}
+            ${callList(entry.calls)}
           </article>`;
       }).join('');
 
@@ -1425,6 +1557,7 @@ TEMPLATE = r"""<!DOCTYPE html>
         `${entries.length} files · ${s.mmdsToastCalls ?? 0} calls`;
     }
 
+    renderStatus();
     renderOverview();
     renderCl();
     renderBn();
@@ -1489,21 +1622,34 @@ TEMPLATE = r"""<!DOCTYPE html>
       onChange: () => applyFilter(),
     });
 
+    const prSelect = initSelect(document.getElementById('pr-select'), {
+      options: [
+        { value: '', label: 'All' },
+        { value: 'draft', label: 'draft' },
+        { value: 'open', label: 'open' },
+        { value: 'none', label: 'none' },
+      ],
+      value: '',
+      onChange: () => applyFilter(),
+    });
+
     function applyFilter() {
       const q = search.value.trim().toLowerCase();
       const owner = ownerSelect?.getValue() || '';
+      const prStatus = prSelect?.getValue() || '';
       document.querySelectorAll('.card[data-hay]').forEach((card) => {
         const hayOk = !q || card.dataset.hay.includes(q);
         const owners = (card.dataset.owners || '').split(/\s+/).filter(Boolean);
         const ownerOk = !owner || owners.includes(owner);
-        card.classList.toggle('hidden', !(hayOk && ownerOk));
+        const prOk = !prStatus || card.dataset.prStatus === prStatus;
+        card.classList.toggle('hidden', !(hayOk && ownerOk && prOk));
       });
     }
     search.addEventListener('input', applyFilter);
 
     function applySort(dir) {
       const tab = document.querySelector('.tab[aria-selected="true"]')?.dataset.tab;
-      if (!tab || tab === 'overview') return;
+      if (!tab || tab === 'overview' || tab === 'status') return;
       sortState[tab] = dir;
       sortSelect?.setValue(dir);
       if (tab === 'cl') renderCl();
@@ -1529,9 +1675,9 @@ TEMPLATE = r"""<!DOCTYPE html>
         panel.hidden = panel.dataset.panel !== selected;
       });
       if (listToolbar) {
-        listToolbar.classList.toggle('is-hidden', selected === 'overview');
+        listToolbar.classList.toggle('is-hidden', selected === 'overview' || selected === 'status');
       }
-      if (selected !== 'overview') {
+      if (selected !== 'overview' && selected !== 'status') {
         sortSelect?.setValue(sortState[selected] || 'desc');
       }
       applyFilter();
@@ -1541,7 +1687,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       tab.addEventListener('click', () => setTab(tab.dataset.tab));
     });
 
-    setTab('cl');
+    setTab('status');
 
     window.addEventListener('keydown', (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key === '/') {
