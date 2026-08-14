@@ -461,6 +461,20 @@ TEMPLATE = r"""<!DOCTYPE html>
       min-width: 0;
     }
 
+    .card-title-actions {
+      display: flex;
+      align-items: flex-start;
+      flex-shrink: 0;
+      gap: 0.5rem;
+      margin: -0.125rem 0 0;
+      padding-left: 0.625rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .card-title-actions .copy-btn {
+      margin: 0;
+    }
+
     .copy-btn {
       flex-shrink: 0;
       display: inline-flex;
@@ -1037,8 +1051,10 @@ TEMPLATE = r"""<!DOCTYPE html>
     function fileTitle(path, pr) {
       return `<h3 class="card-title">
         <span class="card-title-path">${esc(path)}</span>
-        ${prStatus(pr)}
-        <button type="button" class="copy-btn" data-copy="${esc(path)}" aria-label="Copy path" title="Copy path">${COPY_ICON}</button>
+        <span class="card-title-actions">
+          ${prStatus(pr)}
+          <button type="button" class="copy-btn" data-copy="${esc(path)}" aria-label="Copy path" title="Copy path">${COPY_ICON}</button>
+        </span>
       </h3>`;
     }
 
