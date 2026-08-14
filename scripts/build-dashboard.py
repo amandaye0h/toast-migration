@@ -412,21 +412,54 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     .pr-status {
-      display: inline-flex;
-      align-items: center;
-      margin-left: auto;
-      color: inherit;
-      text-decoration: none;
+      display: block;
+      margin-top: 0.25rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
     }
 
-    a.pr-status {
+    .pr-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 2rem;
+      padding: 0 0.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--input);
+      background: color-mix(in oklab, var(--input) 30%, transparent);
+      color: var(--foreground);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: default;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s, color 0.15s;
+    }
+
+    a.pr-btn {
       cursor: pointer;
     }
 
-    a.pr-status:hover .badge.draft,
-    a.pr-status:hover .badge.open {
+    a.pr-btn:hover {
+      background: color-mix(in oklab, var(--muted) 50%, transparent);
       color: var(--foreground);
-      border-color: color-mix(in oklab, var(--foreground) 40%, transparent);
+    }
+
+    a.pr-btn:focus-visible {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+    }
+
+    .pr-btn.draft {
+      border-style: dashed;
+      color: var(--muted-foreground);
+    }
+
+    .pr-btn.open {
+      border-color: color-mix(in oklab, var(--teal-bright) 50%, transparent);
+      color: var(--teal-bright);
     }
 
     .badge {
@@ -453,21 +486,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       background: transparent;
       border-color: color-mix(in oklab, var(--amber) 50%, transparent);
       color: var(--amber);
-    }
-
-    .badge.draft {
-      background: transparent;
-      border-style: dashed;
-      border-color: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
-      color: var(--muted-foreground);
-      text-decoration: none;
-    }
-
-    .badge.open {
-      background: transparent;
-      border-color: color-mix(in oklab, var(--teal-bright) 50%, transparent);
-      color: var(--teal-bright);
-      text-decoration: none;
     }
 
     .badge.owner {
@@ -1134,11 +1152,10 @@ TEMPLATE = r"""<!DOCTYPE html>
       const label = draft ? 'Draft PR' : 'Open PR';
       const kind = draft ? 'draft' : 'open';
       const title = pr.title || (pr.number ? `PR #${pr.number}` : label);
-      const badge = `<span class="badge ${kind}">${esc(label)}</span>`;
       if (pr.url) {
-        return `<a class="pr-status" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${badge}</a>`;
+        return `<div class="pr-status"><a class="pr-btn ${kind}" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${esc(label)}</a></div>`;
       }
-      return `<span class="pr-status" title="${esc(title)}">${badge}</span>`;
+      return `<div class="pr-status"><span class="pr-btn ${kind}" title="${esc(title)}">${esc(label)}</span></div>`;
     }
 
     function prHay(pr) {
@@ -1318,10 +1335,10 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
-              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             ${callList(entry.calls)}
+            ${prStatus(entry.pr)}
           </article>`;
       }).join('');
 
@@ -1360,10 +1377,10 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge warn">producer</span>
               <span class="badge">${entry.count} call${entry.count === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
-              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             <ul class="calls">${hits}</ul>
+            ${prStatus(entry.pr)}
           </article>`;
       }).join('');
 
@@ -1388,10 +1405,10 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge outline">${esc(entry.kind)}</span>
               ${ownerBadges(entry.codeowners)}
-              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             <ul class="calls">${usages}</ul>
+            ${prStatus(entry.pr)}
           </article>`;
       }).join('');
 
@@ -1420,10 +1437,10 @@ TEMPLATE = r"""<!DOCTYPE html>
                 `<span class="badge">${esc(sym)}</span>`
               ).join('')}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
-              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             ${callList(entry.calls)}
+            ${prStatus(entry.pr)}
           </article>`;
       }).join('');
 
