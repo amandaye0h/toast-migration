@@ -27,6 +27,8 @@
       --border: oklch(1 0 0 / 10%);
       --input: oklch(1 0 0 / 15%);
       --ring: #2a5a5e;
+      --popover: oklch(0.205 0 0);
+      --popover-foreground: oklch(0.985 0 0);
       --radius: 0.625rem;
       --teal: #3d7378;
       --teal-bright: #8CD6E5;
@@ -146,6 +148,8 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 0.75rem;
+      position: relative;
+      z-index: 2;
     }
 
     .search-wrap {
@@ -166,17 +170,22 @@
       color: var(--muted-foreground);
     }
 
-    .sort-select {
-      appearance: none;
+    .ui-select {
+      position: relative;
+    }
+
+    .ui-select-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
       height: 2rem;
       min-width: 9.5rem;
-      padding: 0 1.75rem 0 0.75rem;
+      max-width: 16rem;
+      padding: 0 0.75rem;
       border-radius: var(--radius);
       border: 1px solid var(--input);
-      background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b4b4b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
-        no-repeat right 0.45rem center / 0.875rem,
-        color-mix(in oklab, var(--input) 30%, transparent);
+      background: color-mix(in oklab, var(--input) 30%, transparent);
       color: var(--foreground);
       font: inherit;
       font-size: 0.8rem;
@@ -186,13 +195,79 @@
       transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
     }
 
-    .sort-select:hover {
-      background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+    .ui-select-trigger:hover {
+      background: color-mix(in oklab, var(--muted) 50%, transparent);
     }
 
-    .sort-select:focus-visible {
+    .ui-select-trigger:focus-visible,
+    .ui-select[data-open] .ui-select-trigger {
       border-color: var(--ring);
       box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+    }
+
+    .ui-select-value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ui-select-chevron {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+      color: var(--muted-foreground);
+    }
+
+    .ui-select-content {
+      position: absolute;
+      top: calc(100% + 0.25rem);
+      left: 0;
+      z-index: 50;
+      min-width: max(100%, 12rem);
+      max-height: 16rem;
+      overflow: auto;
+      padding: 0.25rem;
+      border-radius: calc(var(--radius) - 2px);
+      border: 1px solid var(--border);
+      background: var(--popover);
+      color: var(--popover-foreground);
+      box-shadow: 0 8px 24px oklch(0 0 0 / 40%);
+    }
+
+    .ui-select-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2rem;
+      padding: 0.25rem 1.75rem 0.25rem 0.5rem;
+      border-radius: calc(var(--radius) - 4px);
+      font-size: 0.8rem;
+      line-height: 1;
+      cursor: default;
+      outline: none;
+      user-select: none;
+    }
+
+    .ui-select-item:hover,
+    .ui-select-item[data-highlighted="true"] {
+      background: var(--muted);
+    }
+
+    .ui-select-check {
+      position: absolute;
+      right: 0.5rem;
+      width: 0.875rem;
+      height: 0.875rem;
+      color: var(--foreground);
+    }
+
+    .ui-select-swatch {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 999px;
+      flex-shrink: 0;
+      background: var(--owner-color, var(--muted-foreground));
     }
 
     .search-wrap svg {
@@ -687,19 +762,26 @@
         </svg>
         <input id="search" class="search" type="search" placeholder="Search files, areas, owners, hints…" aria-label="Search toasts" />
       </div>
-      <label class="sort-group">
-        <span class="sort-label">Sort by calls</span>
-        <select id="sort-select" class="sort-select" aria-label="Sort by calls">
-          <option value="desc">High → low</option>
-          <option value="asc">Low → high</option>
-        </select>
-      </label>
-      <label class="sort-group">
-        <span class="sort-label">Codeowners</span>
-        <select id="owner-select" class="sort-select" aria-label="Filter by codeowners">
-          <option value="">All</option>
-        </select>
-      </label>
+      <div class="sort-group">
+        <span class="sort-label" id="sort-label">Sort by calls</span>
+        <div class="ui-select" id="sort-select">
+          <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sort-label">
+            <span class="ui-select-value">High → low</span>
+            <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="ui-select-content" hidden role="listbox"></div>
+        </div>
+      </div>
+      <div class="sort-group">
+        <span class="sort-label" id="owner-label">Codeowners</span>
+        <div class="ui-select" id="owner-select">
+          <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="owner-label">
+            <span class="ui-select-value">All</span>
+            <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="ui-select-content" hidden role="listbox"></div>
+        </div>
+      </div>
     </div>
 
     <hr class="separator" />
@@ -794,6 +876,122 @@
     const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16V4a2 2 0 0 1 2-2h10"/></svg>`;
     const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>`;
 
+    function initSelect(root, { options, value = '', onChange } = {}) {
+      if (!root) return null;
+      const trigger = root.querySelector('.ui-select-trigger');
+      const valueEl = root.querySelector('.ui-select-value');
+      const content = root.querySelector('.ui-select-content');
+      let items = options || [];
+      let current = value;
+      let highlighted = 0;
+
+      function optionByValue(next) {
+        return items.find((item) => item.value === next) || items[0];
+      }
+
+      function closeOthers() {
+        document.querySelectorAll('.ui-select[data-open]').forEach((other) => {
+          if (other === root) return;
+          other.removeAttribute('data-open');
+          other.querySelector('.ui-select-content')?.setAttribute('hidden', '');
+          other.querySelector('.ui-select-trigger')?.setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      function renderItems() {
+        content.innerHTML = items.map((item, index) => {
+          const selected = item.value === current;
+          const swatch = item.color
+            ? `<span class="ui-select-swatch" style="--owner-color:${item.color}"></span>`
+            : '';
+          const check = selected
+            ? CHECK_ICON.replace('aria-hidden="true"', 'class="ui-select-check" aria-hidden="true"')
+            : '';
+          return `<div class="ui-select-item" role="option" data-value="${esc(item.value)}" aria-selected="${selected}" data-highlighted="${index === highlighted}">${swatch}<span>${esc(item.label)}</span>${check}</div>`;
+        }).join('');
+        content.querySelector('[data-highlighted="true"]')?.scrollIntoView({ block: 'nearest' });
+      }
+
+      function syncTrigger() {
+        const selected = optionByValue(current);
+        valueEl.textContent = selected?.label ?? '';
+        root.dataset.value = current;
+      }
+
+      function setValue(next, emit = false) {
+        current = next;
+        highlighted = Math.max(0, items.findIndex((item) => item.value === current));
+        syncTrigger();
+        renderItems();
+        if (emit) onChange?.(current);
+      }
+
+      function open() {
+        closeOthers();
+        highlighted = Math.max(0, items.findIndex((item) => item.value === current));
+        root.setAttribute('data-open', '');
+        content.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        renderItems();
+      }
+
+      function close() {
+        root.removeAttribute('data-open');
+        content.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+
+      trigger.addEventListener('click', () => {
+        if (root.hasAttribute('data-open')) close();
+        else open();
+      });
+
+      content.addEventListener('pointerdown', (event) => {
+        const item = event.target.closest('.ui-select-item');
+        if (!item) return;
+        event.preventDefault();
+        setValue(item.dataset.value, true);
+        close();
+        trigger.focus();
+      });
+
+      trigger.addEventListener('keydown', (event) => {
+        const openNow = root.hasAttribute('data-open');
+        if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+          event.preventDefault();
+          if (!openNow) {
+            open();
+            return;
+          }
+          if (event.key === 'ArrowDown') highlighted = Math.min(items.length - 1, highlighted + 1);
+          if (event.key === 'ArrowUp') highlighted = Math.max(0, highlighted - 1);
+          if (event.key === 'Enter' || event.key === ' ') {
+            setValue(items[highlighted].value, true);
+            close();
+            return;
+          }
+          renderItems();
+        }
+        if (event.key === 'Escape' && openNow) {
+          event.preventDefault();
+          close();
+        }
+      });
+
+      document.addEventListener('pointerdown', (event) => {
+        if (!root.contains(event.target)) close();
+      });
+
+      syncTrigger();
+      renderItems();
+      content.hidden = true;
+
+      return {
+        getValue: () => current,
+        setValue: (next) => setValue(next, false),
+      };
+    }
+
     function fileTitle(path) {
       return `<h3 class="card-title">
         <span class="card-title-path">${esc(path)}</span>
@@ -802,7 +1000,7 @@
     }
 
     function ownerLabel(owner) {
-      return String(owner).replace(/^@MetaMask\//, '');
+      return String(owner).replace(/^@MetaMask\//, '').replace(/^metamask-/, '');
     }
 
     const OWNER_COLORS = {
@@ -814,7 +1012,7 @@
       'design-system-engineers': 'oklch(0.80 0.10 190)',
       'earn': 'oklch(0.80 0.10 130)',
       'engagement': 'oklch(0.78 0.12 20)',
-      'metamask-assets': 'oklch(0.78 0.11 145)',
+      'assets': 'oklch(0.78 0.11 145)',
       'mobile-admins': 'oklch(0.74 0.05 240)',
       'mobile-core-ux': 'oklch(0.80 0.10 230)',
       'mobile-platform': 'oklch(0.78 0.06 220)',
@@ -1031,7 +1229,6 @@
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              ${roleBadge(entry.role)}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
@@ -1126,7 +1323,6 @@
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              ${roleBadge(entry.role)}
               ${(entry.symbols || []).map((sym) =>
                 `<span class="badge">${esc(sym)}</span>`
               ).join('')}
@@ -1171,7 +1367,6 @@
 
     const search = document.getElementById('search');
     const listToolbar = document.querySelector('.list-toolbar');
-    const ownerSelect = document.getElementById('owner-select');
 
     function collectOwnerLabels() {
       const labels = new Set();
@@ -1194,18 +1389,22 @@
       };
     }
 
-    if (ownerSelect) {
-      const { labels, hasUnassigned } = collectOwnerLabels();
-      ownerSelect.innerHTML = [
-        '<option value="">All</option>',
-        ...labels.map((label) => `<option value="${esc(label)}">${esc(label)}</option>`),
-        hasUnassigned ? '<option value="unassigned">unassigned</option>' : '',
-      ].join('');
-    }
+    const { labels: ownerLabels, hasUnassigned } = collectOwnerLabels();
+    const ownerOptions = [
+      { value: '', label: 'All' },
+      ...ownerLabels.map((label) => ({ value: label, label, color: ownerColor(label) })),
+      ...(hasUnassigned ? [{ value: 'unassigned', label: 'unassigned', color: 'var(--muted-foreground)' }] : []),
+    ];
+
+    const ownerSelect = initSelect(document.getElementById('owner-select'), {
+      options: ownerOptions,
+      value: '',
+      onChange: () => applyFilter(),
+    });
 
     function applyFilter() {
       const q = search.value.trim().toLowerCase();
-      const owner = ownerSelect?.value || '';
+      const owner = ownerSelect?.getValue() || '';
       document.querySelectorAll('.card[data-hay]').forEach((card) => {
         const hayOk = !q || card.dataset.hay.includes(q);
         const owners = (card.dataset.owners || '').split(/\s+/).filter(Boolean);
@@ -1214,22 +1413,26 @@
       });
     }
     search.addEventListener('input', applyFilter);
-    ownerSelect?.addEventListener('change', applyFilter);
-
-    const sortSelect = document.getElementById('sort-select');
 
     function applySort(dir) {
       const tab = document.querySelector('.tab[aria-selected="true"]')?.dataset.tab;
       if (!tab || tab === 'overview') return;
       sortState[tab] = dir;
-      if (sortSelect) sortSelect.value = dir;
+      sortSelect?.setValue(dir);
       if (tab === 'cl') renderCl();
       else if (tab === 'bn') renderBn();
       else if (tab === 'mmds') renderMmds();
       applyFilter();
     }
 
-    sortSelect?.addEventListener('change', () => applySort(sortSelect.value));
+    const sortSelect = initSelect(document.getElementById('sort-select'), {
+      options: [
+        { value: 'desc', label: 'High → low' },
+        { value: 'asc', label: 'Low → high' },
+      ],
+      value: 'desc',
+      onChange: applySort,
+    });
 
     function setTab(selected) {
       document.querySelectorAll('.tab').forEach((t) => {
@@ -1241,8 +1444,8 @@
       if (listToolbar) {
         listToolbar.classList.toggle('is-hidden', selected === 'overview');
       }
-      if (selected !== 'overview' && sortSelect) {
-        sortSelect.value = sortState[selected] || 'desc';
+      if (selected !== 'overview') {
+        sortSelect?.setValue(sortState[selected] || 'desc');
       }
       applyFilter();
     }
@@ -1261,8 +1464,13 @@
           search.select();
         }
       }
-      if (event.key === 'Escape' && document.activeElement === search) {
-        search.blur();
+      if (event.key === 'Escape') {
+        document.querySelectorAll('.ui-select[data-open]').forEach((root) => {
+          root.removeAttribute('data-open');
+          root.querySelector('.ui-select-content')?.setAttribute('hidden', '');
+          root.querySelector('.ui-select-trigger')?.setAttribute('aria-expanded', 'false');
+        });
+        if (document.activeElement === search) search.blur();
       }
     });
   </script>
