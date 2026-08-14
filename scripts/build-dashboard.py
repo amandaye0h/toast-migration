@@ -446,9 +446,6 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     .card-title {
       margin: 0;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.5rem;
       font-weight: 500;
       line-height: 1.35;
       word-break: break-word;
@@ -456,17 +453,27 @@ TEMPLATE = r"""<!DOCTYPE html>
       font-size: 0.8125rem;
     }
 
-    .card-title-path {
-      flex: 1;
+    .card-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.625rem;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .card-main {
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
     .card-title-actions {
       display: flex;
       align-items: flex-start;
+      align-self: stretch;
       flex-shrink: 0;
       gap: 0.5rem;
-      margin: -0.125rem 0 0;
       padding-left: 0.625rem;
       border-left: 1px solid var(--border);
     }
@@ -1048,14 +1055,25 @@ TEMPLATE = r"""<!DOCTYPE html>
       };
     }
 
-    function fileTitle(path, pr) {
-      return `<h3 class="card-title">
-        <span class="card-title-path">${esc(path)}</span>
-        <span class="card-title-actions">
-          ${prStatus(pr)}
-          <button type="button" class="copy-btn" data-copy="${esc(path)}" aria-label="Copy path" title="Copy path">${COPY_ICON}</button>
-        </span>
-      </h3>`;
+    function fileTitle(path) {
+      return `<h3 class="card-title">${esc(path)}</h3>`;
+    }
+
+    function cardActions(path, pr) {
+      return `<span class="card-title-actions">
+        ${prStatus(pr)}
+        <button type="button" class="copy-btn" data-copy="${esc(path)}" aria-label="Copy path" title="Copy path">${COPY_ICON}</button>
+      </span>`;
+    }
+
+    function cardBody(path, pr, extra) {
+      return `<div class="card-body">
+        <div class="card-main">
+          ${fileTitle(path)}
+          ${extra || ''}
+        </div>
+        ${cardActions(path, pr)}
+      </div>`;
     }
 
     function ownerLabel(owner) {
@@ -1302,8 +1320,7 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
-            ${fileTitle(entry.file, entry.pr)}
-            ${callList(entry.calls)}
+            ${cardBody(entry.file, entry.pr, callList(entry.calls))}
           </article>`;
       }).join('');
 
@@ -1343,8 +1360,7 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge">${entry.count} call${entry.count === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
-            ${fileTitle(entry.file, entry.pr)}
-            <ul class="calls">${hits}</ul>
+            ${cardBody(entry.file, entry.pr, `<ul class="calls">${hits}</ul>`)}
           </article>`;
       }).join('');
 
@@ -1370,8 +1386,7 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge outline">${esc(entry.kind)}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
-            ${fileTitle(entry.file, entry.pr)}
-            <ul class="calls">${usages}</ul>
+            ${cardBody(entry.file, entry.pr, `<ul class="calls">${usages}</ul>`)}
           </article>`;
       }).join('');
 
@@ -1401,8 +1416,7 @@ TEMPLATE = r"""<!DOCTYPE html>
               ).join('')}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
             </div>
-            ${fileTitle(entry.file, entry.pr)}
-            ${callList(entry.calls)}
+            ${cardBody(entry.file, entry.pr, callList(entry.calls))}
           </article>`;
       }).join('');
 
