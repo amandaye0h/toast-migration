@@ -1728,8 +1728,13 @@ def fetch_toast_prs(author: str = "amandaye0h", repo: str = "MetaMask/metamask-m
     return [
         pr
         for pr in json.loads(raw)
-        if "toast" in str(pr.get("title", "")).lower()
+        if _is_toast_migration_pr(pr)
     ]
+
+
+def _is_toast_migration_pr(pr: dict) -> bool:
+    title = str(pr.get("title", "")).lower()
+    return "migrate" in title and "toast" in title
 
 
 def attach_pr_status(inventory: dict, prs: list[dict]) -> None:
