@@ -411,51 +411,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       align-items: center;
     }
 
-    .pr-btn {
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 1.5rem;
-      padding: 0 0.5rem;
-      margin: -0.125rem 0 0;
-      border-radius: calc(var(--radius) * 0.7);
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted-foreground);
-      font: inherit;
-      font-size: 0.75rem;
-      font-weight: 500;
-      white-space: nowrap;
-      text-decoration: none;
-      cursor: default;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-    }
-
-    a.pr-btn {
-      cursor: pointer;
-    }
-
-    a.pr-btn:hover {
-      background: color-mix(in oklab, var(--muted) 50%, transparent);
-      color: var(--foreground);
-    }
-
-    a.pr-btn:focus-visible {
-      outline: none;
-      border-color: var(--ring);
-      box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
-    }
-
-    .pr-btn.draft {
-      border-style: dashed;
-    }
-
-    .pr-btn.open {
-      border-color: color-mix(in oklab, var(--teal-bright) 50%, transparent);
-      color: var(--teal-bright);
-    }
-
     .badge {
       display: inline-flex;
       align-items: center;
@@ -519,6 +474,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       border-radius: calc(var(--radius) * 0.7);
       background: transparent;
       color: var(--muted-foreground);
+      text-decoration: none;
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
@@ -960,6 +916,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16V4a2 2 0 0 1 2-2h10"/></svg>`;
     const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>`;
+    const EXPORT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="m10 14 11-11"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
 
     function initSelect(root, { options, value = '', onChange } = {}) {
       if (!root) return null;
@@ -1143,14 +1100,12 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     function prStatus(pr) {
       if (!pr) return '';
-      const draft = Boolean(pr.draft);
-      const label = draft ? 'Draft PR' : 'Open PR';
-      const kind = draft ? 'draft' : 'open';
+      const label = pr.draft ? 'Open draft PR' : 'Open PR';
       const title = pr.title || (pr.number ? `PR #${pr.number}` : label);
       if (pr.url) {
-        return `<a class="pr-btn ${kind}" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${esc(label)}</a>`;
+        return `<a class="copy-btn" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}" aria-label="${esc(label)}">${EXPORT_ICON}</a>`;
       }
-      return `<span class="pr-btn ${kind}" title="${esc(title)}">${esc(label)}</span>`;
+      return `<span class="copy-btn" title="${esc(title)}" aria-label="${esc(label)}">${EXPORT_ICON}</span>`;
     }
 
     function prHay(pr) {
