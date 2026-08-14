@@ -497,8 +497,8 @@
     }
 
     .copy-btn svg {
-      width: 1.125rem;
-      height: 1.125rem;
+      width: 16px;
+      height: 16px;
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -899,9 +899,6 @@
     <hr class="separator" />
 
     <section id="panel-status" data-panel="status">
-      <p class="note" style="margin-bottom: 0.75rem;">
-        Remaining toast work by CODEOWNERS team, for manager updates. Files already covered by an open or draft PR are listed as in PR.
-      </p>
       <div class="status-wrap">
         <table class="status-table" id="status-table">
           <thead>
@@ -1301,9 +1298,6 @@
         .sort((a, b) => {
           if (a === 'unassigned') return 1;
           if (b === 'unassigned') return -1;
-          const aCalls = (cl.get(a)?.calls || 0) + (bn.get(a)?.calls || 0);
-          const bCalls = (cl.get(b)?.calls || 0) + (bn.get(b)?.calls || 0);
-          if (bCalls !== aCalls) return bCalls - aCalls;
           return a.localeCompare(b);
         });
 

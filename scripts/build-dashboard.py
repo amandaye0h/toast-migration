@@ -815,11 +815,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       text-align: right;
     }
 
-    .status-table tbody tr:hover th,
-    .status-table tbody tr:hover td {
-      background: color-mix(in oklab, var(--muted) 55%, transparent);
-    }
-
     .status-owner {
       display: flex;
       align-items: center;
@@ -909,9 +904,6 @@ TEMPLATE = r"""<!DOCTYPE html>
     <hr class="separator" />
 
     <section id="panel-status" data-panel="status">
-      <p class="note" style="margin-bottom: 0.75rem;">
-        Remaining toast work by CODEOWNERS team, for manager updates. Files already covered by an open or draft PR are listed as in PR.
-      </p>
       <div class="status-wrap">
         <table class="status-table" id="status-table">
           <thead>
@@ -1311,9 +1303,6 @@ TEMPLATE = r"""<!DOCTYPE html>
         .sort((a, b) => {
           if (a === 'unassigned') return 1;
           if (b === 'unassigned') return -1;
-          const aCalls = (cl.get(a)?.calls || 0) + (bn.get(a)?.calls || 0);
-          const bCalls = (cl.get(b)?.calls || 0) + (bn.get(b)?.calls || 0);
-          if (bCalls !== aCalls) return bCalls - aCalls;
           return a.localeCompare(b);
         });
 
