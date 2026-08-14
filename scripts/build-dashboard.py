@@ -153,8 +153,8 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     .list-toolbar {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 0.75rem;
       position: relative;
@@ -163,20 +163,48 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     .search-wrap {
       position: relative;
-      flex: 1 1 16rem;
-      max-width: 28rem;
+      min-width: 0;
+    }
+
+    .toolbar-filters {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .sort-group {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       gap: 0.5rem;
+      flex: 0 0 auto;
     }
 
     .sort-label {
       font-size: 0.75rem;
       color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      .list-toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar-filters {
+        width: 100%;
+      }
+
+      .sort-group {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .sort-group .ui-select,
+      .sort-group .ui-select-trigger {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+      }
     }
 
     .ui-select {
@@ -771,24 +799,26 @@ TEMPLATE = r"""<!DOCTYPE html>
         </svg>
         <input id="search" class="search" type="search" placeholder="Search files, areas, owners, hints…" aria-label="Search toasts" />
       </div>
-      <div class="sort-group">
-        <span class="sort-label" id="sort-label">Sort by calls</span>
-        <div class="ui-select" id="sort-select">
-          <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sort-label">
-            <span class="ui-select-value">High → low</span>
-            <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <div class="ui-select-content" hidden role="listbox"></div>
+      <div class="toolbar-filters">
+        <div class="sort-group">
+          <span class="sort-label" id="sort-label">Sort</span>
+          <div class="ui-select" id="sort-select">
+            <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sort-label">
+              <span class="ui-select-value">High → low</span>
+              <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="ui-select-content" hidden role="listbox"></div>
+          </div>
         </div>
-      </div>
-      <div class="sort-group">
-        <span class="sort-label" id="owner-label">Codeowners</span>
-        <div class="ui-select" id="owner-select">
-          <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="owner-label">
-            <span class="ui-select-value">All</span>
-            <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <div class="ui-select-content" hidden role="listbox"></div>
+        <div class="sort-group">
+          <span class="sort-label" id="owner-label">Owner</span>
+          <div class="ui-select" id="owner-select">
+            <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="owner-label">
+              <span class="ui-select-value">All</span>
+              <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="ui-select-content" hidden role="listbox"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1064,11 +1094,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       return owners.map(ownerLabel).join(' ');
     }
 
-    function roleBadge(role) {
-      if (!role || role === 'consumer') return '';
-      return `<span class="badge outline">${esc(role)}</span>`;
-    }
-
     function callList(calls) {
       if (!calls?.length) return '';
       return `<ul class="calls">${calls.map((c) => `
@@ -1238,7 +1263,6 @@ TEMPLATE = r"""<!DOCTYPE html>
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              ${roleBadge(entry.role)}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
@@ -1333,7 +1357,6 @@ TEMPLATE = r"""<!DOCTYPE html>
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              ${roleBadge(entry.role)}
               ${(entry.symbols || []).map((sym) =>
                 `<span class="badge">${esc(sym)}</span>`
               ).join('')}
