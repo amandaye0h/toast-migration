@@ -414,7 +414,6 @@ TEMPLATE = r"""<!DOCTYPE html>
     .pr-status {
       display: inline-flex;
       align-items: center;
-      gap: 0.375rem;
       margin-left: auto;
       color: inherit;
       text-decoration: none;
@@ -424,19 +423,10 @@ TEMPLATE = r"""<!DOCTYPE html>
       cursor: pointer;
     }
 
-    a.pr-status:hover .pr-label {
-      color: var(--foreground);
-    }
-
-    a.pr-status:hover .badge.draft {
+    a.pr-status:hover .badge.draft,
+    a.pr-status:hover .badge.open {
       color: var(--foreground);
       border-color: color-mix(in oklab, var(--foreground) 40%, transparent);
-    }
-
-    .pr-label {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: var(--muted-foreground);
     }
 
     .badge {
@@ -470,6 +460,13 @@ TEMPLATE = r"""<!DOCTYPE html>
       border-style: dashed;
       border-color: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
       color: var(--muted-foreground);
+      text-decoration: none;
+    }
+
+    .badge.open {
+      background: transparent;
+      border-color: color-mix(in oklab, var(--teal-bright) 50%, transparent);
+      color: var(--teal-bright);
       text-decoration: none;
     }
 
@@ -1132,18 +1129,21 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     function prStatus(pr) {
-      if (!pr?.draft) return '';
-      const title = pr.title || (pr.number ? `PR #${pr.number}` : 'Open pull request');
-      const body = `<span class="pr-label">PR:</span><span class="badge draft">draft</span>`;
+      if (!pr) return '';
+      const draft = Boolean(pr.draft);
+      const label = draft ? 'Draft PR' : 'Open PR';
+      const kind = draft ? 'draft' : 'open';
+      const title = pr.title || (pr.number ? `PR #${pr.number}` : label);
+      const badge = `<span class="badge ${kind}">${esc(label)}</span>`;
       if (pr.url) {
-        return `<a class="pr-status" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${body}</a>`;
+        return `<a class="pr-status" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${badge}</a>`;
       }
-      return `<span class="pr-status" title="${esc(title)}">${body}</span>`;
+      return `<span class="pr-status" title="${esc(title)}">${badge}</span>`;
     }
 
     function prHay(pr) {
-      if (!pr?.draft) return [];
-      return ['draft', String(pr.number || ''), pr.title || ''];
+      if (!pr) return [];
+      return [pr.draft ? 'draft pr' : 'open pr', String(pr.number || ''), pr.title || ''];
     }
 
     function callList(calls) {
@@ -1606,16 +1606,14 @@ def fetch_toast_prs(author: str = "amandaye0h", repo: str = "MetaMask/metamask-m
 
 
 def attach_pr_status(inventory: dict, prs: list[dict]) -> None:
-    """Attach draft PRs onto matching inventory files. Ready PRs are omitted."""
+    """Attach open toast PRs onto matching inventory files."""
     by_file: dict[str, dict] = {}
     for pr in prs:
-        if not pr.get("isDraft"):
-            continue
         info = {
             "number": pr["number"],
             "url": pr["url"],
             "title": pr["title"],
-            "draft": True,
+            "draft": bool(pr.get("isDraft")),
         }
         for file_info in pr.get("files") or []:
             path = file_info.get("path")
@@ -1639,7 +1637,7 @@ def attach_pr_status(inventory: dict, prs: list[dict]) -> None:
                 attached += 1
             else:
                 entry.pop("pr", None)
-    print(f"Attached draft PR status to {attached} file(s) from {len(prs)} toast PR(s)")
+    print(f"Attached PR status to {attached} file(s) from {len(prs)} toast PR(s)")
 
 
 def main() -> None:
