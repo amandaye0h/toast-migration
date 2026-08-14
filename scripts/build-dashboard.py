@@ -150,9 +150,55 @@ TEMPLATE = r"""<!DOCTYPE html>
       line-height: 1;
     }
 
+    .list-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
     .search-wrap {
       position: relative;
+      flex: 1 1 16rem;
       max-width: 28rem;
+    }
+
+    .sort-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .sort-label {
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+      margin-right: 0.125rem;
+    }
+
+    .sort-btn {
+      height: 1.75rem;
+      padding: 0 0.75rem;
+      border-radius: calc(var(--radius) * 0.8);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted-foreground);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .sort-btn:hover {
+      background: color-mix(in oklab, var(--muted) 50%, transparent);
+      color: var(--foreground);
+    }
+
+    .sort-btn[aria-pressed="true"] {
+      border-color: var(--border);
+      background: var(--muted);
+      color: var(--foreground);
     }
 
     .search-wrap svg {
@@ -608,7 +654,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       }
     }
 
-    .search-wrap.is-hidden { display: none; }
+    .list-toolbar.is-hidden { display: none; }
 
     [hidden] { display: none !important; }
   </style>
@@ -632,12 +678,19 @@ TEMPLATE = r"""<!DOCTYPE html>
       <button class="tab" role="tab" data-tab="mmds" aria-selected="false">MMDS</button>
     </div>
 
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="8"></circle>
-        <path d="m21 21-4.3-4.3"></path>
-      </svg>
-      <input id="search" class="search" type="search" placeholder="Search files, areas, hints…" aria-label="Search toasts" />
+    <div class="list-toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input id="search" class="search" type="search" placeholder="Search files, areas, hints…" aria-label="Search toasts" />
+      </div>
+      <div class="sort-group" role="group" aria-label="Sort by calls">
+        <span class="sort-label">Sort by calls</span>
+        <button type="button" class="sort-btn" data-sort="asc" aria-pressed="false">Low → high</button>
+        <button type="button" class="sort-btn" data-sort="desc" aria-pressed="true">High → low</button>
+      </div>
     </div>
 
     <hr class="separator" />
@@ -881,8 +934,18 @@ TEMPLATE = r"""<!DOCTYPE html>
       });
     }
 
+    const sortState = { cl: 'desc', bn: 'desc', mmds: 'desc' };
+
+    function sortedByCalls(entries, dir, countOf) {
+      return [...entries].sort((a, b) => {
+        const diff = (countOf(a) || 0) - (countOf(b) || 0);
+        if (diff !== 0) return dir === 'asc' ? diff : -diff;
+        return String(a.file || '').localeCompare(String(b.file || ''));
+      });
+    }
+
     function renderCl() {
-      const cards = DATA.componentLibraryToasts.map((entry) => {
+      const cards = sortedByCalls(DATA.componentLibraryToasts, sortState.cl, (e) => e.callCount).map((entry) => {
         const hay = [entry.file, entry.area, entry.role, entry.via, ...entry.calls.map((c) => `${c.hint} ${c.code}`)]
           .join(' ')
           .toLowerCase();
@@ -904,7 +967,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     function renderBn() {
-      const producers = DATA.baseNotificationProducers.map((entry) => {
+      const producers = sortedByCalls(DATA.baseNotificationProducers, sortState.bn, (e) => e.count).map((entry) => {
         const hits = entry.hits.map((h) => {
           const label = h.title || h.i18nKeys?.[0] || h.code;
           return `
@@ -931,7 +994,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           </article>`;
       }).join('');
 
-      const consumers = DATA.baseNotificationConsumers.map((entry) => {
+      const consumers = sortedByCalls(DATA.baseNotificationConsumers, sortState.bn, (e) => e.usages?.length).map((entry) => {
         const usages = entry.usages.map((u) =>
           `<li><span class="line">L${u.line}</span> · ${esc(u.code)}</li>`
         ).join('');
@@ -954,7 +1017,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
 
     function renderMmds() {
-      const entries = DATA.mmdsToasts || [];
+      const entries = sortedByCalls(DATA.mmdsToasts || [], sortState.mmds, (e) => e.callCount);
       const cards = entries.map((entry) => {
         const hay = [
           entry.file,
@@ -1013,7 +1076,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     });
 
     const search = document.getElementById('search');
-    const searchWrap = document.querySelector('.search-wrap');
+    const listToolbar = document.querySelector('.list-toolbar');
     function applyFilter() {
       const q = search.value.trim().toLowerCase();
       document.querySelectorAll('.card[data-hay]').forEach((card) => {
@@ -1022,6 +1085,27 @@ TEMPLATE = r"""<!DOCTYPE html>
     }
     search.addEventListener('input', applyFilter);
 
+    function syncSortButtons(dir) {
+      document.querySelectorAll('.sort-btn').forEach((btn) => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.sort === dir));
+      });
+    }
+
+    function applySort(dir) {
+      const tab = document.querySelector('.tab[aria-selected="true"]')?.dataset.tab;
+      if (!tab || tab === 'overview') return;
+      sortState[tab] = dir;
+      syncSortButtons(dir);
+      if (tab === 'cl') renderCl();
+      else if (tab === 'bn') renderBn();
+      else if (tab === 'mmds') renderMmds();
+      applyFilter();
+    }
+
+    document.querySelectorAll('.sort-btn').forEach((btn) => {
+      btn.addEventListener('click', () => applySort(btn.dataset.sort));
+    });
+
     function setTab(selected) {
       document.querySelectorAll('.tab').forEach((t) => {
         t.setAttribute('aria-selected', String(t.dataset.tab === selected));
@@ -1029,8 +1113,11 @@ TEMPLATE = r"""<!DOCTYPE html>
       document.querySelectorAll('[data-panel]').forEach((panel) => {
         panel.hidden = panel.dataset.panel !== selected;
       });
-      if (searchWrap) {
-        searchWrap.classList.toggle('is-hidden', selected === 'overview');
+      if (listToolbar) {
+        listToolbar.classList.toggle('is-hidden', selected === 'overview');
+      }
+      if (selected !== 'overview') {
+        syncSortButtons(sortState[selected] || 'desc');
       }
       applyFilter();
     }
@@ -1044,7 +1131,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     window.addEventListener('keydown', (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key === '/') {
         event.preventDefault();
-        if (!searchWrap?.classList.contains('is-hidden')) {
+        if (!listToolbar?.classList.contains('is-hidden')) {
           search.focus();
           search.select();
         }
