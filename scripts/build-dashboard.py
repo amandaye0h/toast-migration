@@ -411,6 +411,34 @@ TEMPLATE = r"""<!DOCTYPE html>
       align-items: center;
     }
 
+    .pr-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      margin-left: auto;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a.pr-status {
+      cursor: pointer;
+    }
+
+    a.pr-status:hover .pr-label {
+      color: var(--foreground);
+    }
+
+    a.pr-status:hover .badge.draft {
+      color: var(--foreground);
+      border-color: color-mix(in oklab, var(--foreground) 40%, transparent);
+    }
+
+    .pr-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted-foreground);
+    }
+
     .badge {
       display: inline-flex;
       align-items: center;
@@ -443,11 +471,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       border-color: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
       color: var(--muted-foreground);
       text-decoration: none;
-    }
-
-    a.badge.draft:hover {
-      color: var(--foreground);
-      border-color: color-mix(in oklab, var(--foreground) 40%, transparent);
     }
 
     .badge.owner {
@@ -1108,13 +1131,14 @@ TEMPLATE = r"""<!DOCTYPE html>
       return owners.map(ownerLabel).join(' ');
     }
 
-    function prBadge(pr) {
+    function prStatus(pr) {
       if (!pr?.draft) return '';
-      const title = pr.title ? ` title="${esc(pr.title)}"` : '';
+      const title = pr.title || (pr.number ? `PR #${pr.number}` : 'Open pull request');
+      const body = `<span class="pr-label">PR:</span><span class="badge draft">draft</span>`;
       if (pr.url) {
-        return `<a class="badge draft" href="${esc(pr.url)}" target="_blank" rel="noreferrer"${title}>draft</a>`;
+        return `<a class="pr-status" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${body}</a>`;
       }
-      return `<span class="badge draft"${title}>draft</span>`;
+      return `<span class="pr-status" title="${esc(title)}">${body}</span>`;
     }
 
     function prHay(pr) {
@@ -1292,9 +1316,9 @@ TEMPLATE = r"""<!DOCTYPE html>
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              ${prBadge(entry.pr)}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
+              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             ${callList(entry.calls)}
@@ -1334,9 +1358,9 @@ TEMPLATE = r"""<!DOCTYPE html>
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge warn">producer</span>
-              ${prBadge(entry.pr)}
               <span class="badge">${entry.count} call${entry.count === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
+              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             <ul class="calls">${hits}</ul>
@@ -1363,8 +1387,8 @@ TEMPLATE = r"""<!DOCTYPE html>
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge outline">${esc(entry.kind)}</span>
-              ${prBadge(entry.pr)}
               ${ownerBadges(entry.codeowners)}
+              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             <ul class="calls">${usages}</ul>
@@ -1392,11 +1416,11 @@ TEMPLATE = r"""<!DOCTYPE html>
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              ${prBadge(entry.pr)}
               ${(entry.symbols || []).map((sym) =>
                 `<span class="badge">${esc(sym)}</span>`
               ).join('')}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
+              ${prStatus(entry.pr)}
             </div>
             ${fileTitle(entry.file)}
             ${callList(entry.calls)}
