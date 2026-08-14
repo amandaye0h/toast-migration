@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 from pathlib import Path
 
 TEMPLATE = r"""<!DOCTYPE html>
@@ -436,6 +437,19 @@ TEMPLATE = r"""<!DOCTYPE html>
       color: var(--amber);
     }
 
+    .badge.draft {
+      background: transparent;
+      border-style: dashed;
+      border-color: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
+      color: var(--muted-foreground);
+      text-decoration: none;
+    }
+
+    a.badge.draft:hover {
+      color: var(--foreground);
+      border-color: color-mix(in oklab, var(--foreground) 40%, transparent);
+    }
+
     .badge.owner {
       --owner-color: var(--foreground);
       background: color-mix(in oklab, var(--owner-color) 14%, transparent);
@@ -785,10 +799,10 @@ TEMPLATE = r"""<!DOCTYPE html>
     </header>
 
     <div class="tabs" role="tablist" aria-label="Toast systems">
-      <button class="tab" role="tab" data-tab="overview" aria-selected="true">Overview</button>
-      <button class="tab" role="tab" data-tab="cl" aria-selected="false">Component-library</button>
+      <button class="tab" role="tab" data-tab="cl" aria-selected="true">Component-library</button>
       <button class="tab" role="tab" data-tab="bn" aria-selected="false">BaseNotification</button>
       <button class="tab" role="tab" data-tab="mmds" aria-selected="false">MMDS</button>
+      <button class="tab" role="tab" data-tab="overview" aria-selected="false">Overview</button>
     </div>
 
     <div class="list-toolbar">
@@ -825,11 +839,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     <hr class="separator" />
 
-    <section id="panel-overview" data-panel="overview">
-      <div class="charts" id="overview-charts"></div>
-    </section>
-
-    <section id="panel-cl" data-panel="cl" hidden>
+    <section id="panel-cl" data-panel="cl">
       <div class="list" style="gap: 1.5rem;">
         <div>
           <p class="note" style="margin-bottom: 0.75rem;">
@@ -867,6 +877,10 @@ TEMPLATE = r"""<!DOCTYPE html>
           <div class="list" id="mmds-list"></div>
         </div>
       </div>
+    </section>
+
+    <section id="panel-overview" data-panel="overview" hidden>
+      <div class="charts" id="overview-charts"></div>
     </section>
 
     <footer>
@@ -1094,6 +1108,20 @@ TEMPLATE = r"""<!DOCTYPE html>
       return owners.map(ownerLabel).join(' ');
     }
 
+    function prBadge(pr) {
+      if (!pr?.draft) return '';
+      const title = pr.title ? ` title="${esc(pr.title)}"` : '';
+      if (pr.url) {
+        return `<a class="badge draft" href="${esc(pr.url)}" target="_blank" rel="noreferrer"${title}>draft</a>`;
+      }
+      return `<span class="badge draft"${title}>draft</span>`;
+    }
+
+    function prHay(pr) {
+      if (!pr?.draft) return [];
+      return ['draft', String(pr.number || ''), pr.title || ''];
+    }
+
     function callList(calls) {
       if (!calls?.length) return '';
       return `<ul class="calls">${calls.map((c) => `
@@ -1255,6 +1283,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           entry.via,
           ...(entry.codeowners || []),
           ...(entry.codeowners || []).map(ownerLabel),
+          ...prHay(entry.pr),
           ...entry.calls.map((c) => `${c.hint} ${c.code}`),
         ]
           .join(' ')
@@ -1263,6 +1292,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
+              ${prBadge(entry.pr)}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
@@ -1294,6 +1324,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           entry.area,
           ...(entry.codeowners || []),
           ...(entry.codeowners || []).map(ownerLabel),
+          ...prHay(entry.pr),
           ...entry.hits.flatMap((h) => [h.title, h.description, ...(h.i18nKeys || []), h.code]),
         ]
           .join(' ')
@@ -1303,6 +1334,7 @@ TEMPLATE = r"""<!DOCTYPE html>
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge warn">producer</span>
+              ${prBadge(entry.pr)}
               <span class="badge">${entry.count} call${entry.count === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
@@ -1321,6 +1353,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           entry.kind,
           ...(entry.codeowners || []),
           ...(entry.codeowners || []).map(ownerLabel),
+          ...prHay(entry.pr),
           ...entry.usages.map((u) => u.code),
         ]
           .join(' ')
@@ -1330,6 +1363,7 @@ TEMPLATE = r"""<!DOCTYPE html>
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge outline">${esc(entry.kind)}</span>
+              ${prBadge(entry.pr)}
               ${ownerBadges(entry.codeowners)}
             </div>
             ${fileTitle(entry.file)}
@@ -1349,6 +1383,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           entry.area,
           entry.role,
           ...(entry.symbols || []),
+          ...prHay(entry.pr),
           ...entry.calls.map((c) => `${c.hint} ${c.code}`),
         ]
           .join(' ')
@@ -1357,6 +1392,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
+              ${prBadge(entry.pr)}
               ${(entry.symbols || []).map((sym) =>
                 `<span class="badge">${esc(sym)}</span>`
               ).join('')}
@@ -1488,7 +1524,7 @@ TEMPLATE = r"""<!DOCTYPE html>
       tab.addEventListener('click', () => setTab(tab.dataset.tab));
     });
 
-    setTab('overview');
+    setTab('cl');
 
     window.addEventListener('keydown', (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key === '/') {
@@ -1513,6 +1549,75 @@ TEMPLATE = r"""<!DOCTYPE html>
 """
 
 
+def fetch_toast_prs(author: str = "amandaye0h", repo: str = "MetaMask/metamask-mobile") -> list[dict]:
+    """Open toast-related PRs for the dashboard author."""
+    try:
+        raw = subprocess.check_output(
+            [
+                "gh",
+                "pr",
+                "list",
+                "--repo",
+                repo,
+                "--author",
+                author,
+                "--state",
+                "open",
+                "--json",
+                "number,title,isDraft,url,files",
+                "--limit",
+                "50",
+            ],
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        print(f"Skipping PR status: {exc}")
+        return []
+    return [
+        pr
+        for pr in json.loads(raw)
+        if "toast" in str(pr.get("title", "")).lower()
+    ]
+
+
+def attach_pr_status(inventory: dict, prs: list[dict]) -> None:
+    """Attach draft PRs onto matching inventory files. Ready PRs are omitted."""
+    by_file: dict[str, dict] = {}
+    for pr in prs:
+        if not pr.get("isDraft"):
+            continue
+        info = {
+            "number": pr["number"],
+            "url": pr["url"],
+            "title": pr["title"],
+            "draft": True,
+        }
+        for file_info in pr.get("files") or []:
+            path = file_info.get("path")
+            if not path:
+                continue
+            existing = by_file.get(path)
+            if existing is None or info["number"] > existing["number"]:
+                by_file[path] = info
+
+    attached = 0
+    for key in (
+        "componentLibraryToasts",
+        "baseNotificationProducers",
+        "baseNotificationConsumers",
+        "mmdsToasts",
+    ):
+        for entry in inventory.get(key) or []:
+            pr = by_file.get(entry.get("file"))
+            if pr:
+                entry["pr"] = pr
+                attached += 1
+            else:
+                entry.pop("pr", None)
+    print(f"Attached draft PR status to {attached} file(s) from {len(prs)} toast PR(s)")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -1528,6 +1633,7 @@ def main() -> None:
     args = parser.parse_args()
 
     inventory = json.loads(args.inventory.read_text())
+    attach_pr_status(inventory, fetch_toast_prs())
     html = TEMPLATE.replace("__DATA__", json.dumps(inventory))
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(html)
