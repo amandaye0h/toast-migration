@@ -449,8 +449,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 2.25rem;
-      height: 2.25rem;
+      width: 32px;
+      height: 32px;
       margin: 0;
       padding: 0;
       border: 1px solid var(--input);
@@ -797,6 +797,7 @@
     .status-nums {
       font-variant-numeric: tabular-nums;
       font-weight: 500;
+      color: var(--muted-foreground);
     }
 
     .status-pr {
@@ -854,7 +855,7 @@
           <span class="sort-label" id="sort-label">Sort</span>
           <div class="ui-select" id="sort-select">
             <button type="button" class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sort-label">
-              <span class="ui-select-value">High → low</span>
+              <span class="ui-select-value">Low → high</span>
               <svg class="ui-select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="ui-select-content" hidden role="listbox"></div>
@@ -1267,13 +1268,12 @@
           const label = owners.length ? ownerLabel(owners[0]) : 'unassigned';
           let row = byOwner.get(label);
           if (!row) {
-            row = { files: 0, calls: 0, prFiles: 0, prs: [], owner: owners[0] || '' };
+            row = { files: 0, calls: 0, prs: [], owner: owners[0] || '' };
             byOwner.set(label, row);
           }
           row.files += 1;
           row.calls += countOf(entry) || 0;
           if (entry.pr) {
-            row.prFiles += 1;
             const key = entry.pr.number || entry.pr.url;
             if (key && !row.prs.some((p) => (p.number || p.url) === key)) {
               row.prs.push(entry.pr);
@@ -1304,18 +1304,12 @@
       function cell(stats) {
         if (!stats?.files) return '<span class="status-empty">—</span>';
         const prs = [...(stats.prs || [])].sort((a, b) => (a.number || 0) - (b.number || 0));
-        let pr = '';
-        if (stats.prFiles) {
-          if (prs.length === 1) {
-            pr = `<div class="status-pr">${prLink(prs[0], `${stats.prFiles} in PR`)}</div>`;
-          } else if (prs.length > 1) {
-            const links = prs.map((p) => prLink(p, p.number ? `#${p.number}` : 'PR')).join(' · ');
-            pr = `<div class="status-pr">${stats.prFiles} in PR ${links}</div>`;
-          } else {
-            pr = `<div class="status-pr">${stats.prFiles} in PR</div>`;
-          }
-        }
-        return `<div class="status-nums">${stats.files} file${stats.files === 1 ? '' : 's'} · ${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>${pr}`;
+        const pr = prs.length
+          ? `<div class="status-pr">${prs.map((p) =>
+              prLink(p, p.number ? `#${p.number}` : p.url || '')
+            ).filter(Boolean).join(' · ')}</div>`
+          : '';
+        return `<div class="status-nums">${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>${pr}`;
       }
 
       const body = labels.map((label) => {
@@ -1410,7 +1404,7 @@
       });
     }
 
-    const sortState = { cl: 'desc', bn: 'desc', mmds: 'desc' };
+    const sortState = { cl: 'asc', bn: 'asc', mmds: 'asc' };
 
     function sortedByCalls(entries, dir, countOf) {
       return [...entries].sort((a, b) => {
@@ -1579,6 +1573,7 @@
     });
 
     const listToolbar = document.querySelector('.list-toolbar');
+    const separator = document.querySelector('.separator');
 
     function collectOwnerLabels() {
       const labels = new Set();
@@ -1649,25 +1644,25 @@
 
     const sortSelect = initSelect(document.getElementById('sort-select'), {
       options: [
-        { value: 'desc', label: 'High → low' },
         { value: 'asc', label: 'Low → high' },
+        { value: 'desc', label: 'High → low' },
       ],
-      value: 'desc',
+      value: 'asc',
       onChange: applySort,
     });
 
     document.getElementById('reset-filters')?.addEventListener('click', () => {
       ownerSelect?.setValue('');
       prSelect?.setValue('');
-      sortState.cl = 'desc';
-      sortState.bn = 'desc';
-      sortState.mmds = 'desc';
+      sortState.cl = 'asc';
+      sortState.bn = 'asc';
+      sortState.mmds = 'asc';
       const tab = document.querySelector('.tab[aria-selected="true"]')?.dataset.tab;
       if (tab && tab !== 'overview' && tab !== 'status') {
-        applySort('desc');
+        applySort('asc');
         return;
       }
-      sortSelect?.setValue('desc');
+      sortSelect?.setValue('asc');
       applyFilter();
     });
 
@@ -1681,8 +1676,9 @@
       if (listToolbar) {
         listToolbar.classList.toggle('is-hidden', selected === 'overview' || selected === 'status');
       }
+      if (separator) separator.hidden = selected === 'status';
       if (selected !== 'overview' && selected !== 'status') {
-        sortSelect?.setValue(sortState[selected] || 'desc');
+        sortSelect?.setValue(sortState[selected] || 'asc');
       }
       applyFilter();
     }
