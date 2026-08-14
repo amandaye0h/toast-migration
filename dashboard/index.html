@@ -169,6 +169,7 @@
     .sort-select {
       appearance: none;
       height: 2rem;
+      min-width: 9.5rem;
       padding: 0 1.75rem 0 0.75rem;
       border-radius: var(--radius);
       border: 1px solid var(--input);
@@ -324,9 +325,10 @@
     }
 
     .badge.owner {
-      background: transparent;
-      border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
-      color: var(--foreground);
+      --owner-color: var(--foreground);
+      background: color-mix(in oklab, var(--owner-color) 14%, transparent);
+      border-color: color-mix(in oklab, var(--owner-color) 45%, transparent);
+      color: var(--owner-color);
     }
 
     .card-title {
@@ -692,6 +694,12 @@
           <option value="asc">Low → high</option>
         </select>
       </label>
+      <label class="sort-group">
+        <span class="sort-label">Codeowners</span>
+        <select id="owner-select" class="sort-select" aria-label="Filter by codeowners">
+          <option value="">All</option>
+        </select>
+      </label>
     </div>
 
     <hr class="separator" />
@@ -797,13 +805,61 @@
       return String(owner).replace(/^@MetaMask\//, '');
     }
 
+    const OWNER_COLORS = {
+      'accounts-engineers': 'oklch(0.78 0.10 250)',
+      'card': 'oklch(0.80 0.12 75)',
+      'confirmations': 'oklch(0.80 0.09 200)',
+      'core-platform': 'oklch(0.76 0.08 260)',
+      'delegation': 'oklch(0.76 0.10 310)',
+      'design-system-engineers': 'oklch(0.80 0.10 190)',
+      'earn': 'oklch(0.80 0.10 130)',
+      'engagement': 'oklch(0.78 0.12 20)',
+      'metamask-assets': 'oklch(0.78 0.11 145)',
+      'mobile-admins': 'oklch(0.74 0.05 240)',
+      'mobile-core-ux': 'oklch(0.80 0.10 230)',
+      'mobile-platform': 'oklch(0.78 0.06 220)',
+      'money-movement': 'oklch(0.80 0.11 160)',
+      'perps': 'oklch(0.78 0.12 45)',
+      'predict': 'oklch(0.78 0.13 300)',
+      'product-safety': 'oklch(0.78 0.12 15)',
+      'qa': 'oklch(0.78 0.08 120)',
+      'rewards': 'oklch(0.82 0.13 95)',
+      'social-ai': 'oklch(0.80 0.12 350)',
+      'supply-chain': 'oklch(0.78 0.08 80)',
+      'swaps-engineers': 'oklch(0.78 0.11 55)',
+      'transactions': 'oklch(0.78 0.10 35)',
+      'wallet-integrations': 'oklch(0.78 0.09 215)',
+      'web3auth': 'oklch(0.76 0.13 280)',
+    };
+    const OWNER_PALETTE = Object.values(OWNER_COLORS);
+
+    function ownerColor(label) {
+      if (OWNER_COLORS[label]) return OWNER_COLORS[label];
+      let hash = 0;
+      for (let i = 0; i < label.length; i++) {
+        hash = (hash * 33) ^ label.charCodeAt(i);
+      }
+      return OWNER_PALETTE[Math.abs(hash) % OWNER_PALETTE.length];
+    }
+
     function ownerBadges(owners) {
       if (!owners?.length) {
         return '<span class="badge">unassigned</span>';
       }
-      return owners.map((owner) =>
-        `<span class="badge owner">${esc(ownerLabel(owner))}</span>`
-      ).join('');
+      return owners.map((owner) => {
+        const label = ownerLabel(owner);
+        return `<span class="badge owner" style="--owner-color:${ownerColor(label)}" title="${esc(owner)}">${esc(label)}</span>`;
+      }).join('');
+    }
+
+    function ownerAttr(owners) {
+      if (!owners?.length) return 'unassigned';
+      return owners.map(ownerLabel).join(' ');
+    }
+
+    function roleBadge(role) {
+      if (!role || role === 'consumer') return '';
+      return `<span class="badge outline">${esc(role)}</span>`;
     }
 
     function callList(calls) {
@@ -972,10 +1028,10 @@
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              <span class="badge outline">${esc(entry.role)}</span>
+              ${roleBadge(entry.role)}
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
               ${ownerBadges(entry.codeowners)}
             </div>
@@ -1012,7 +1068,7 @@
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge warn">producer</span>
@@ -1039,7 +1095,7 @@
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge outline">${esc(entry.kind)}</span>
@@ -1067,10 +1123,10 @@
           .join(' ')
           .toLowerCase();
         return `
-          <article class="card" data-hay="${esc(hay)}">
+          <article class="card" data-hay="${esc(hay)}" data-owners="${esc(ownerAttr(entry.codeowners))}">
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
-              <span class="badge outline">${esc(entry.role)}</span>
+              ${roleBadge(entry.role)}
               ${(entry.symbols || []).map((sym) =>
                 `<span class="badge">${esc(sym)}</span>`
               ).join('')}
@@ -1115,13 +1171,50 @@
 
     const search = document.getElementById('search');
     const listToolbar = document.querySelector('.list-toolbar');
+    const ownerSelect = document.getElementById('owner-select');
+
+    function collectOwnerLabels() {
+      const labels = new Set();
+      let hasUnassigned = false;
+      for (const list of [
+        DATA.componentLibraryToasts,
+        DATA.baseNotificationProducers,
+        DATA.baseNotificationConsumers,
+        DATA.mmdsToasts,
+      ]) {
+        for (const entry of list || []) {
+          const owners = entry.codeowners || [];
+          if (!owners.length) hasUnassigned = true;
+          for (const owner of owners) labels.add(ownerLabel(owner));
+        }
+      }
+      return {
+        labels: [...labels].sort((a, b) => a.localeCompare(b)),
+        hasUnassigned,
+      };
+    }
+
+    if (ownerSelect) {
+      const { labels, hasUnassigned } = collectOwnerLabels();
+      ownerSelect.innerHTML = [
+        '<option value="">All</option>',
+        ...labels.map((label) => `<option value="${esc(label)}">${esc(label)}</option>`),
+        hasUnassigned ? '<option value="unassigned">unassigned</option>' : '',
+      ].join('');
+    }
+
     function applyFilter() {
       const q = search.value.trim().toLowerCase();
+      const owner = ownerSelect?.value || '';
       document.querySelectorAll('.card[data-hay]').forEach((card) => {
-        card.classList.toggle('hidden', Boolean(q) && !card.dataset.hay.includes(q));
+        const hayOk = !q || card.dataset.hay.includes(q);
+        const owners = (card.dataset.owners || '').split(/\s+/).filter(Boolean);
+        const ownerOk = !owner || owners.includes(owner);
+        card.classList.toggle('hidden', !(hayOk && ownerOk));
       });
     }
     search.addEventListener('input', applyFilter);
+    ownerSelect?.addEventListener('change', applyFilter);
 
     const sortSelect = document.getElementById('sort-select');
 
