@@ -332,6 +332,12 @@ TEMPLATE = r"""<!DOCTYPE html>
       color: var(--amber);
     }
 
+    .badge.owner {
+      background: transparent;
+      border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
+      color: var(--foreground);
+    }
+
     .card-title {
       margin: 0;
       display: flex;
@@ -686,7 +692,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.3-4.3"></path>
         </svg>
-        <input id="search" class="search" type="search" placeholder="Search files, areas, hints…" aria-label="Search toasts" />
+        <input id="search" class="search" type="search" placeholder="Search files, areas, owners, hints…" aria-label="Search toasts" />
       </div>
       <label class="sort-group">
         <span class="sort-label">Sort by calls</span>
@@ -794,6 +800,19 @@ TEMPLATE = r"""<!DOCTYPE html>
         <span class="card-title-path">${esc(path)}</span>
         <button type="button" class="copy-btn" data-copy="${esc(path)}" aria-label="Copy path" title="Copy path">${COPY_ICON}</button>
       </h3>`;
+    }
+
+    function ownerLabel(owner) {
+      return String(owner).replace(/^@MetaMask\//, '');
+    }
+
+    function ownerBadges(owners) {
+      if (!owners?.length) {
+        return '<span class="badge">unassigned</span>';
+      }
+      return owners.map((owner) =>
+        `<span class="badge owner">${esc(ownerLabel(owner))}</span>`
+      ).join('');
     }
 
     function callList(calls) {
@@ -950,7 +969,15 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     function renderCl() {
       const cards = sortedByCalls(DATA.componentLibraryToasts, sortState.cl, (e) => e.callCount).map((entry) => {
-        const hay = [entry.file, entry.area, entry.role, entry.via, ...entry.calls.map((c) => `${c.hint} ${c.code}`)]
+        const hay = [
+          entry.file,
+          entry.area,
+          entry.role,
+          entry.via,
+          ...(entry.codeowners || []),
+          ...(entry.codeowners || []).map(ownerLabel),
+          ...entry.calls.map((c) => `${c.hint} ${c.code}`),
+        ]
           .join(' ')
           .toLowerCase();
         return `
@@ -959,6 +986,7 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge outline">${esc(entry.role)}</span>
               <span class="badge">${entry.callCount} call${entry.callCount === 1 ? '' : 's'}</span>
+              ${ownerBadges(entry.codeowners)}
             </div>
             ${fileTitle(entry.file)}
             ${callList(entry.calls)}
@@ -983,7 +1011,13 @@ TEMPLATE = r"""<!DOCTYPE html>
               }
             </li>`;
         }).join('');
-        const hay = [entry.file, entry.area, ...entry.hits.flatMap((h) => [h.title, h.description, ...(h.i18nKeys || []), h.code])]
+        const hay = [
+          entry.file,
+          entry.area,
+          ...(entry.codeowners || []),
+          ...(entry.codeowners || []).map(ownerLabel),
+          ...entry.hits.flatMap((h) => [h.title, h.description, ...(h.i18nKeys || []), h.code]),
+        ]
           .join(' ')
           .toLowerCase();
         return `
@@ -992,6 +1026,7 @@ TEMPLATE = r"""<!DOCTYPE html>
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge warn">producer</span>
               <span class="badge">${entry.count} call${entry.count === 1 ? '' : 's'}</span>
+              ${ownerBadges(entry.codeowners)}
             </div>
             ${fileTitle(entry.file)}
             <ul class="calls">${hits}</ul>
@@ -1002,7 +1037,14 @@ TEMPLATE = r"""<!DOCTYPE html>
         const usages = entry.usages.map((u) =>
           `<li><span class="line">L${u.line}</span> · ${esc(u.code)}</li>`
         ).join('');
-        const hay = [entry.file, entry.area, entry.kind, ...entry.usages.map((u) => u.code)]
+        const hay = [
+          entry.file,
+          entry.area,
+          entry.kind,
+          ...(entry.codeowners || []),
+          ...(entry.codeowners || []).map(ownerLabel),
+          ...entry.usages.map((u) => u.code),
+        ]
           .join(' ')
           .toLowerCase();
         return `
@@ -1010,6 +1052,7 @@ TEMPLATE = r"""<!DOCTYPE html>
             <div class="badges">
               <span class="badge">${esc(entry.area)}</span>
               <span class="badge outline">${esc(entry.kind)}</span>
+              ${ownerBadges(entry.codeowners)}
             </div>
             ${fileTitle(entry.file)}
             <ul class="calls">${usages}</ul>

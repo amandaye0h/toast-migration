@@ -1,10 +1,10 @@
 {
   "sourceRepo": "metamask-mobile",
   "sourcePath": "/Users/amanda/Documents/metamask-mobile/app",
-  "scannedAt": "2026-08-12T22:45:38",
+  "scannedAt": "2026-08-14T19:38:30",
   "summary": {
-    "componentLibraryToastFiles": 77,
-    "componentLibraryToastCalls": 107,
+    "componentLibraryToastFiles": 80,
+    "componentLibraryToastCalls": 112,
     "componentLibraryByArea": {
       "UI/Card": 12,
       "UI/Predict": 10,
@@ -12,6 +12,7 @@
       "UI/Rewards": 4,
       "UI/QuickBuy": 4,
       "UI/Assets": 3,
+      "Views/confirmations": 3,
       "UI/HardwareWallet": 3,
       "Nav/App": 3,
       "UI/Ramp": 2,
@@ -19,17 +20,18 @@
       "Nav/Main": 2,
       "Views/Notifications": 2,
       "Views/SocialLeaderboard": 2,
-      "Views/confirmations": 2,
       "Views/AddAsset": 1,
+      "UI/AssetOverview": 1,
+      "UI/CollectibleDetectionModal": 1,
       "UI/Earn": 1,
       "UI/MarketInsights": 1,
       "UI/Money": 1,
       "UI/QRHardware": 1,
+      "UI/TokenDetails": 1,
       "UI/Transactions": 1,
       "Views/ActivityList": 1,
       "Views/AddressQRCode": 1,
       "Views/Browser": 1,
-      "Views/Homepage": 1,
       "Views/ImportFromSecretRecoveryPhrase": 1,
       "Views/ImportNewSecretRecoveryPhrase": 1,
       "Views/QRAccountDisplay": 1,
@@ -44,13 +46,10 @@
     "baseNotificationConsumerFiles": 4,
     "baseNotificationProducerFiles": 15,
     "baseNotificationProducerCalls": 23,
-    "mmdsToastFiles": 7,
-    "mmdsToastCalls": 6,
+    "mmdsToastFiles": 4,
+    "mmdsToastCalls": 3,
     "mmdsByArea": {
       "Views/MultichainAccounts": 3,
-      "UI/AssetOverview": 1,
-      "UI/CollectibleDetectionModal": 1,
-      "UI/TokenDetails": 1,
       "Nav/App": 1
     }
   },
@@ -97,6 +96,9 @@
           "code": "showToast(",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/rewards"
       ]
     },
     {
@@ -131,6 +133,9 @@
           "code": "showToast({",
           "hint": "\\n"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
       ]
     },
     {
@@ -141,25 +146,28 @@
       "callCount": 4,
       "calls": [
         {
-          "line": 132,
+          "line": 133,
           "code": "toastRef?.current?.showToast({",
           "hint": "price_alerts.fetch_error"
         },
         {
-          "line": 226,
+          "line": 227,
           "code": "toastRef?.current?.showToast({",
           "hint": "price_alerts.delete_success"
         },
         {
-          "line": 237,
+          "line": 238,
           "code": "toastRef?.current?.showToast({",
           "hint": "price_alerts.delete_error"
         },
         {
-          "line": 307,
+          "line": 308,
           "code": "toastRef?.current?.showToast({",
           "hint": "price_alerts.toggle_error"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -170,25 +178,28 @@
       "callCount": 4,
       "calls": [
         {
-          "line": 99,
+          "line": 103,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 189,
+          "line": 202,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 203,
+          "line": 216,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 346,
+          "line": 378,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -218,6 +229,9 @@
           "code": "showToast(PerpsToastOptions.accountManagement.deposit.error);",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/perps"
       ]
     },
     {
@@ -228,20 +242,23 @@
       "callCount": 3,
       "calls": [
         {
-          "line": 275,
+          "line": 279,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 303,
+          "line": 307,
           "code": "toastRef.current.showToast({",
           "hint": ""
         },
         {
-          "line": 317,
+          "line": 321,
           "code": "toastRef.current.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -252,20 +269,23 @@
       "callCount": 3,
       "calls": [
         {
-          "line": 209,
+          "line": 214,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 222,
+          "line": 227,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 234,
+          "line": 239,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -276,20 +296,23 @@
       "callCount": 3,
       "calls": [
         {
-          "line": 222,
+          "line": 225,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 244,
+          "line": 247,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 268,
+          "line": 271,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -314,6 +337,9 @@
           "code": "showToast({",
           "hint": "\\n"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/perps"
       ]
     },
     {
@@ -338,6 +364,36 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "\\n"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
+      ]
+    },
+    {
+      "file": "app/components/Views/confirmations/components/modals/mm-pay-debug-modal/mm-pay-debug-modal.tsx",
+      "area": "Views/confirmations",
+      "role": "consumer",
+      "via": "import",
+      "callCount": 3,
+      "calls": [
+        {
+          "line": 53,
+          "code": "toastRef?.current?.showToast({",
+          "hint": ""
+        },
+        {
+          "line": 67,
+          "code": "showToast('Copy failed (clipboard unavailable)');",
+          "hint": ""
+        },
+        {
+          "line": 74,
+          "code": "showToast(message);",
+          "hint": ""
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/confirmations"
       ]
     },
     {
@@ -357,6 +413,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "price_alerts.save_error"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -376,6 +435,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -386,15 +448,18 @@
       "callCount": 2,
       "calls": [
         {
-          "line": 162,
+          "line": 165,
           "code": "toastRef?.current?.showToast({",
           "hint": "card.asset_selection.update_success"
         },
         {
-          "line": 172,
+          "line": 175,
           "code": "toastRef?.current?.showToast({",
           "hint": "card.asset_selection.update_error"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -405,15 +470,18 @@
       "callCount": 2,
       "calls": [
         {
-          "line": 570,
+          "line": 580,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 583,
+          "line": 593,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -433,6 +501,9 @@
           "code": "showToast(toastConfig);",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/perps"
       ]
     },
     {
@@ -452,6 +523,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "\\n"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
       ]
     },
     {
@@ -471,6 +545,9 @@
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
       ]
     },
     {
@@ -481,15 +558,18 @@
       "callCount": 2,
       "calls": [
         {
-          "line": 1471,
+          "line": 1527,
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         },
         {
-          "line": 1544,
+          "line": 1600,
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/social-ai"
       ]
     },
     {
@@ -509,6 +589,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/money-movement"
       ]
     },
     {
@@ -528,6 +611,9 @@
           "code": "showToast(",
           "hint": "rewards.campaign_outcome_toast.non_winner.title"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/rewards"
       ]
     },
     {
@@ -547,6 +633,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "collectible.ownership_verification_error"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -566,6 +655,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "toast.disconnected_all"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
       ]
     },
     {
@@ -580,7 +672,8 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/Nav/Main/utils.ts",
@@ -594,6 +687,24 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": []
+    },
+    {
+      "file": "app/components/UI/AssetOverview/TokenDetails/TokenDetailsList/TokenDetailsList.tsx",
+      "area": "UI/AssetOverview",
+      "role": "consumer",
+      "via": "import",
+      "callCount": 1,
+      "calls": [
+        {
+          "line": 44,
+          "code": "toastRef?.current?.showToast({",
+          "hint": ""
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -608,6 +719,9 @@
           "code": "ToastService.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -622,6 +736,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "card.set_pin.success_title"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -632,10 +749,13 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 193,
+          "line": 200,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -650,6 +770,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -660,10 +783,13 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 84,
+          "line": 120,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
       ]
     },
     {
@@ -678,6 +804,26 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/card"
+      ]
+    },
+    {
+      "file": "app/components/UI/CollectibleDetectionModal/index.tsx",
+      "area": "UI/CollectibleDetectionModal",
+      "role": "consumer",
+      "via": "import",
+      "callCount": 1,
+      "calls": [
+        {
+          "line": 34,
+          "code": "toastRef?.current?.showToast({",
+          "hint": "toast.nft_detection_enabled"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -692,6 +838,9 @@
           "code": "toastRef?.current?.showToast(toastOptions as ToastOptions);",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/earn"
       ]
     },
     {
@@ -706,6 +855,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
       ]
     },
     {
@@ -720,6 +872,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "market_insights.feedback_submitted"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/social-ai"
       ]
     },
     {
@@ -734,6 +889,9 @@
           "code": "toastRef?.current?.showToast(toastOptions as ToastOptions);",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/earn"
       ]
     },
     {
@@ -748,6 +906,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/perps"
       ]
     },
     {
@@ -762,6 +923,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/perps"
       ]
     },
     {
@@ -776,6 +940,9 @@
           "code": "toastRef?.current?.showToast(toastOptions as ToastOptions);",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/perps"
       ]
     },
     {
@@ -786,10 +953,13 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 430,
+          "line": 435,
           "code": "ToastService.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
       ]
     },
     {
@@ -804,6 +974,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
       ]
     },
     {
@@ -818,6 +991,9 @@
           "code": "return toastRef?.current?.showToast(",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
       ]
     },
     {
@@ -832,6 +1008,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": "\\n"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/predict"
       ]
     },
     {
@@ -846,7 +1025,8 @@
           "code": "ToastService.showToast(",
           "hint": ""
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/UI/QuickBuy/resolveQuickBuyTerminalToast.ts",
@@ -860,6 +1040,9 @@
           "code": "showToast(",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/social-ai"
       ]
     },
     {
@@ -874,6 +1057,9 @@
           "code": "ToastService.showToast(toastOptions);",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/money-movement"
       ]
     },
     {
@@ -888,6 +1074,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/rewards"
       ]
     },
     {
@@ -902,6 +1091,26 @@
           "code": "toastRef?.current?.showToast(toastOptions as ToastOptions);",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/rewards"
+      ]
+    },
+    {
+      "file": "app/components/UI/TokenDetails/hooks/useCopyTokenContractAddress.ts",
+      "area": "UI/TokenDetails",
+      "role": "consumer",
+      "via": "import",
+      "callCount": 1,
+      "calls": [
+        {
+          "line": 26,
+          "code": "toastRef?.current?.showToast({",
+          "hint": ""
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -916,6 +1125,9 @@
           "code": "ToastService.showToast(getTransactionUpdateErrorToastOptions(error));",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/mobile-core-ux"
       ]
     },
     {
@@ -930,7 +1142,8 @@
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/Views/AddressQRCode/index.js",
@@ -944,6 +1157,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/mobile-core-ux"
       ]
     },
     {
@@ -958,21 +1174,8 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
-      ]
-    },
-    {
-      "file": "app/components/Views/Homepage/Sections/Cash/CashGetMusdEmptyState.tsx",
-      "area": "Views/Homepage",
-      "role": "consumer",
-      "via": "import",
-      "callCount": 1,
-      "calls": [
-        {
-          "line": 111,
-          "code": "toastRef?.current?.showToast({",
-          "hint": ""
-        }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/Views/ImportFromSecretRecoveryPhrase/index.tsx",
@@ -986,6 +1189,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/web3auth"
       ]
     },
     {
@@ -1000,6 +1206,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/web3auth"
       ]
     },
     {
@@ -1014,6 +1223,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
       ]
     },
     {
@@ -1028,6 +1240,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/engagement"
       ]
     },
     {
@@ -1042,6 +1257,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/engagement"
       ]
     },
     {
@@ -1056,6 +1274,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/mobile-core-ux"
       ]
     },
     {
@@ -1070,7 +1291,8 @@
           "code": "toastRef?.showToast({",
           "hint": ""
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/Views/RevealPrivateCredential/RevealPrivateCredential.tsx",
@@ -1084,6 +1306,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/web3auth"
       ]
     },
     {
@@ -1098,6 +1323,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/social-ai"
       ]
     },
     {
@@ -1112,6 +1340,9 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/social-ai"
       ]
     },
     {
@@ -1126,6 +1357,9 @@
           "code": "toastRefStable.current?.current?.showToast(",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/mobile-core-ux"
       ]
     },
     {
@@ -1136,11 +1370,12 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 665,
+          "line": 651,
           "code": "toast?.showToast({",
           "hint": ""
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/Views/confirmations/components/gas/gas-fee-token-toast/gas-fee-token-toast.tsx",
@@ -1154,6 +1389,9 @@
           "code": "toast.showToast({",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/confirmations"
       ]
     },
     {
@@ -1168,6 +1406,9 @@
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         }
+      ],
+      "codeowners": [
+        "@MetaMask/confirmations"
       ]
     },
     {
@@ -1182,7 +1423,8 @@
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/Nav/App/App.tsx",
@@ -1190,7 +1432,8 @@
       "role": "host",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": []
     },
     {
       "file": "app/components/Nav/App/ControllerEventToastBridge/ControllerEventToastBridge.tsx",
@@ -1198,7 +1441,8 @@
       "role": "bridge",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": []
     },
     {
       "file": "app/components/Nav/App/ControllerEventToastBridge/ControllerEventToastBridge.types.ts",
@@ -1206,7 +1450,8 @@
       "role": "bridge",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": []
     },
     {
       "file": "app/components/UI/HardwareWallet/Swaps/HwQrScanner.tsx",
@@ -1214,7 +1459,10 @@
       "role": "consumer",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
+      ]
     },
     {
       "file": "app/components/UI/HardwareWallet/Swaps/useHwSwapLifecycle.ts",
@@ -1222,7 +1470,10 @@
       "role": "consumer",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
+      ]
     },
     {
       "file": "app/components/UI/Predict/hooks/usePredictShare.utils.tsx",
@@ -1230,7 +1481,10 @@
       "role": "consumer",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/predict"
+      ]
     },
     {
       "file": "app/components/UI/Predict/utils/predictErrorHandler.ts",
@@ -1238,7 +1492,10 @@
       "role": "consumer",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/predict"
+      ]
     },
     {
       "file": "app/components/UI/QuickBuy/hooks/useQuickBuyToastRegistrations.tsx",
@@ -1246,7 +1503,10 @@
       "role": "bridge",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/social-ai"
+      ]
     },
     {
       "file": "app/components/UI/QuickBuy/quickBuyToastOptions.tsx",
@@ -1254,7 +1514,10 @@
       "role": "options",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/social-ai"
+      ]
     },
     {
       "file": "app/components/Views/Root/index.tsx",
@@ -1262,7 +1525,10 @@
       "role": "host",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/mobile-platform"
+      ]
     },
     {
       "file": "app/util/confirmation/transactions.ts",
@@ -1270,7 +1536,10 @@
       "role": "consumer",
       "via": "import",
       "callCount": 0,
-      "calls": []
+      "calls": [],
+      "codeowners": [
+        "@MetaMask/confirmations"
+      ]
     }
   ],
   "baseNotificationConsumers": [
@@ -1287,6 +1556,9 @@
           "line": 12,
           "code": "<BaseNotification"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/engagement"
       ]
     },
     {
@@ -1299,16 +1571,22 @@
           "code": "import BaseNotification from '../../../../component-library/components-temp/BaseNotification';"
         },
         {
-          "line": 288,
+          "line": 282,
           "code": "<BaseNotification"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/engagement"
       ]
     },
     {
       "file": "app/components/UI/Notification/index.js",
       "kind": "wrapper",
       "area": "UI/Notification",
-      "usages": []
+      "usages": [],
+      "codeowners": [
+        "@MetaMask/engagement"
+      ]
     },
     {
       "file": "app/components/Views/Onboarding/index.tsx",
@@ -1320,9 +1598,12 @@
           "code": "import BaseNotification from '../../../component-library/components-temp/BaseNotification';"
         },
         {
-          "line": 1270,
+          "line": 1275,
           "code": "<BaseNotification"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/web3auth"
       ]
     }
   ],
@@ -1348,7 +1629,8 @@
           "i18nKeys": [],
           "code": "showSimpleNotification: (args) => dispatch(showSimpleNotification(args)),"
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/UI/AccountApproval/index.js",
@@ -1367,7 +1649,8 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/UI/AssetActivation/AssetActivateCard.tsx",
@@ -1384,7 +1667,8 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/UI/Ramp/Aggregator/containers/ApplePayButton.tsx",
@@ -1401,6 +1685,9 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/money-movement"
       ]
     },
     {
@@ -1416,6 +1703,9 @@
           "i18nKeys": [],
           "code": "NotificationManager.showSimpleNotification(notificationDetails);"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/money-movement"
       ]
     },
     {
@@ -1444,6 +1734,9 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -1462,6 +1755,9 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -1480,6 +1776,9 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -1499,6 +1798,9 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
       ]
     },
     {
@@ -1519,7 +1821,8 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/components/Views/confirmations/legacy/components/WatchAssetRequest/index.js",
@@ -1537,6 +1840,9 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/confirmations"
       ]
     },
     {
@@ -1554,7 +1860,8 @@
           ],
           "code": "showSimpleNotification({"
         }
-      ]
+      ],
+      "codeowners": []
     },
     {
       "file": "app/core/DeeplinkManager/handlers/legacy/handleApproveUrl.ts",
@@ -1572,6 +1879,9 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/mobile-platform"
       ]
     },
     {
@@ -1656,6 +1966,9 @@
           ],
           "code": "showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/mobile-platform"
       ]
     },
     {
@@ -1673,64 +1986,13 @@
           ],
           "code": "NotificationManager.showSimpleNotification({"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/confirmations"
       ]
     }
   ],
   "mmdsToasts": [
-    {
-      "file": "app/components/UI/AssetOverview/TokenDetails/TokenDetailsList/TokenDetailsList.tsx",
-      "area": "UI/AssetOverview",
-      "role": "consumer",
-      "symbols": [
-        "ToastSeverity",
-        "toast"
-      ],
-      "callCount": 1,
-      "calls": [
-        {
-          "line": 38,
-          "code": "toast({",
-          "hint": "account_details.account_copied_to_clipboard",
-          "kind": "call"
-        }
-      ]
-    },
-    {
-      "file": "app/components/UI/CollectibleDetectionModal/index.tsx",
-      "area": "UI/CollectibleDetectionModal",
-      "role": "consumer",
-      "symbols": [
-        "ToastSeverity",
-        "toast"
-      ],
-      "callCount": 1,
-      "calls": [
-        {
-          "line": 26,
-          "code": "toast({",
-          "hint": "toast.nft_detection_enabled",
-          "kind": "call"
-        }
-      ]
-    },
-    {
-      "file": "app/components/UI/TokenDetails/hooks/useCopyTokenContractAddress.ts",
-      "area": "UI/TokenDetails",
-      "role": "consumer",
-      "symbols": [
-        "ToastSeverity",
-        "toast"
-      ],
-      "callCount": 1,
-      "calls": [
-        {
-          "line": 18,
-          "code": "toast({",
-          "hint": "account_details.account_copied_to_clipboard",
-          "kind": "call"
-        }
-      ]
-    },
     {
       "file": "app/components/Views/MultichainAccounts/AddressList/AddressList.tsx",
       "area": "Views/MultichainAccounts",
@@ -1741,11 +2003,14 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 101,
+          "line": 116,
           "code": "toast({",
           "hint": "notifications.address_copied_to_clipboard",
           "kind": "call"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
       ]
     },
     {
@@ -1763,6 +2028,9 @@
           "hint": "toast.permissions_updated",
           "kind": "call"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
       ]
     },
     {
@@ -1780,6 +2048,9 @@
           "hint": "multichain_accounts.private_key_list.copied",
           "kind": "call"
         }
+      ],
+      "codeowners": [
+        "@MetaMask/accounts-engineers"
       ]
     },
     {
@@ -1792,12 +2063,13 @@
       "callCount": 0,
       "calls": [
         {
-          "line": 1499,
+          "line": 1504,
           "code": "<Toaster />",
           "hint": "",
           "kind": "host"
         }
-      ]
+      ],
+      "codeowners": []
     }
   ]
 }

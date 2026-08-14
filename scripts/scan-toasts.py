@@ -37,6 +37,107 @@ BN_INFRA_PREFIXES = (
 )
 
 
+def parse_codeowners(text: str) -> list[tuple[str, list[str]]]:
+    """Parse CODEOWNERS rules in file order. Later matches override earlier ones."""
+    rules: list[tuple[str, list[str]]] = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        parts = line.split()
+        rules.append((parts[0], parts[1:]))
+    return rules
+
+
+def _glob_to_regex(pattern: str) -> re.Pattern[str]:
+    """Convert a gitignore-style CODEOWNERS pattern to a full-path regex."""
+    if pattern.startswith("/"):
+        body = pattern[1:]
+        prefix = r"^"
+    elif "/" not in pattern.rstrip("/"):
+        body = pattern
+        prefix = r"(?:^|.*/)"
+    else:
+        body = pattern
+        prefix = r"^"
+
+    regex = prefix
+    i = 0
+    n = len(body)
+    while i < n:
+        if body.startswith("**/", i):
+            regex += r"(?:.*/)?"
+            i += 3
+        elif body.startswith("**", i) and i + 2 == n:
+            regex += r".*"
+            i += 2
+        elif body[i] == "*":
+            regex += r"[^/]*"
+            i += 1
+        elif body[i] == "?":
+            regex += r"[^/]"
+            i += 1
+        else:
+            regex += re.escape(body[i])
+            i += 1
+    return re.compile(regex + r"$")
+
+
+class CodeOwners:
+    """Last-matching CODEOWNERS rule wins, matching GitHub's precedence."""
+
+    def __init__(self, text: str):
+        self.rules = parse_codeowners(text)
+        self._glob_cache: dict[str, re.Pattern[str]] = {}
+
+    def owners_for(self, path: str) -> list[str]:
+        path = path.lstrip("/")
+        matched: list[str] = []
+        for pattern, owners in self.rules:
+            if self._matches(path, pattern):
+                matched = owners
+        return matched
+
+    def _matches(self, path: str, pattern: str) -> bool:
+        directory_only = pattern.endswith("/")
+        body = pattern[1:] if pattern.startswith("/") else pattern
+        body = body.rstrip("/")
+        has_magic = bool(re.search(r"[*?[]", body))
+
+        if not has_magic:
+            if "/" not in body:
+                return (
+                    path == body
+                    or path.startswith(body + "/")
+                    or path.endswith("/" + body)
+                    or f"/{body}/" in f"/{path}/"
+                )
+            return path == body or path.startswith(body + "/")
+
+        glob_pattern = pattern.rstrip("/") if directory_only else pattern
+        compiled = self._glob_cache.get(glob_pattern)
+        if compiled is None:
+            compiled = _glob_to_regex(glob_pattern)
+            self._glob_cache[glob_pattern] = compiled
+        return compiled.fullmatch(path) is not None
+
+
+def load_codeowners(mobile_root: Path) -> CodeOwners:
+    for candidate in (
+        mobile_root / ".github" / "CODEOWNERS",
+        mobile_root / "CODEOWNERS",
+        mobile_root / "docs" / "CODEOWNERS",
+    ):
+        if candidate.is_file():
+            return CodeOwners(candidate.read_text(errors="ignore"))
+    return CodeOwners("")
+
+
+def attach_codeowners(entries: list[dict], codeowners: CodeOwners) -> None:
+    for entry in entries:
+        entry["codeowners"] = codeowners.owners_for(entry["file"])
+
+
 def should_skip(path: Path) -> bool:
     text = str(path)
     return any(token in text for token in SKIP) or path.suffix not in {
@@ -279,6 +380,12 @@ def build_inventory(mobile_root: Path) -> dict:
     bn_consumers = scan_base_notification_consumers(app_root)
     bn_producers = scan_base_notification_producers(app_root)
     mmds = scan_mmds_toasts(app_root)
+
+    codeowners = load_codeowners(mobile_root)
+    attach_codeowners(cl, codeowners)
+    attach_codeowners(bn_consumers, codeowners)
+    attach_codeowners(bn_producers, codeowners)
+    attach_codeowners(mmds, codeowners)
 
     return {
         "sourceRepo": "metamask-mobile",
