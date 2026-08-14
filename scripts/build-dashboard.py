@@ -1279,11 +1279,29 @@ TEMPLATE = r"""<!DOCTYPE html>
         return byOwner;
       }
 
+      function mergePrs(target, entries) {
+        for (const entry of entries || []) {
+          if (!entry.pr) continue;
+          const owners = entry.codeowners || [];
+          const label = owners.length ? ownerLabel(owners[0]) : 'unassigned';
+          let row = target.get(label);
+          if (!row) {
+            row = { files: 0, calls: 0, prs: [], owner: owners[0] || '' };
+            target.set(label, row);
+          }
+          const key = entry.pr.number || entry.pr.url;
+          if (key && !row.prs.some((p) => (p.number || p.url) === key)) {
+            row.prs.push(entry.pr);
+          }
+        }
+      }
+
       const cl = tally(DATA.componentLibraryToasts, (e) => e.callCount);
       const bn = tally(
         [...(DATA.baseNotificationProducers || []), ...(DATA.baseNotificationConsumers || [])],
         (e) => e.count || e.usages?.length || 0,
       );
+      mergePrs(cl, DATA.mmdsToasts);
       const labels = [...new Set([...cl.keys(), ...bn.keys()])]
         .sort((a, b) => {
           if (a === 'unassigned') return 1;
@@ -1298,14 +1316,18 @@ TEMPLATE = r"""<!DOCTYPE html>
       }
 
       function cell(stats) {
-        if (!stats?.files) return '<span class="status-empty">—</span>';
+        if (!stats) return '<span class="status-empty">—</span>';
         const prs = [...(stats.prs || [])].sort((a, b) => (a.number || 0) - (b.number || 0));
         const pr = prs.length
           ? `<div class="status-pr">${prs.map((p) =>
               prLink(p, p.number ? `#${p.number}` : p.url || '')
             ).filter(Boolean).join(' · ')}</div>`
           : '';
-        return `<div class="status-nums">${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>${pr}`;
+        if (!stats.files && !pr) return '<span class="status-empty">—</span>';
+        const nums = stats.files
+          ? `<div class="status-nums">${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>`
+          : '';
+        return `${nums}${pr}`;
       }
 
       const body = labels.map((label) => {
