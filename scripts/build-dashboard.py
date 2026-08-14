@@ -547,16 +547,6 @@ TEMPLATE = r"""<!DOCTYPE html>
       color: color-mix(in oklab, var(--foreground) 80%, transparent);
     }
 
-    footer {
-      font-size: 0.8125rem;
-      color: var(--muted-foreground);
-    }
-
-    footer code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.75rem;
-    }
-
     .chart-card {
       display: flex;
       flex-direction: column;
@@ -955,10 +945,6 @@ TEMPLATE = r"""<!DOCTYPE html>
     <section id="panel-overview" data-panel="overview" hidden>
       <div class="charts" id="overview-charts"></div>
     </section>
-
-    <footer>
-      Re-scan: <code>python3 scripts/scan-toasts.py && python3 scripts/build-dashboard.py</code>
-    </footer>
   </div>
 
   <script>
