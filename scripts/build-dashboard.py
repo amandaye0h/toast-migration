@@ -800,6 +800,14 @@ TEMPLATE = r"""<!DOCTYPE html>
       color: var(--muted-foreground);
     }
 
+    .status-state.is-open {
+      color: var(--mmds);
+    }
+
+    .status-state.is-merged {
+      color: var(--cl);
+    }
+
     .status-pr {
       margin-top: 0.2rem;
       font-size: 0.75rem;
@@ -1324,10 +1332,12 @@ TEMPLATE = r"""<!DOCTYPE html>
       function prStatusLabel(prs) {
         const labels = [];
         const open = prs.filter((p) => prState(p) !== 'MERGED');
-        if (open.some((p) => p.draft)) labels.push('Draft');
-        if (open.some((p) => !p.draft)) labels.push('In Review');
-        if (prs.some((p) => prState(p) === 'MERGED')) labels.push('Merged');
-        return labels.join(' · ');
+        if (open.some((p) => p.draft)) labels.push(['Draft', 'draft']);
+        if (open.some((p) => !p.draft)) labels.push(['Open', 'open']);
+        if (prs.some((p) => prState(p) === 'MERGED')) labels.push(['Merged', 'merged']);
+        return labels.map(([text, kind]) =>
+          `<span class="status-state is-${kind}">${esc(text)}</span>`
+        ).join('<span class="status-state-sep"> · </span>');
       }
 
       function cell(stats) {
@@ -1340,7 +1350,7 @@ TEMPLATE = r"""<!DOCTYPE html>
           : '';
         if (!stats.files && !pr) return '<span class="status-empty">—</span>';
         const nums = prs.length
-          ? `<div class="status-nums">${esc(prStatusLabel(prs))}</div>`
+          ? `<div class="status-nums">${prStatusLabel(prs)}</div>`
           : stats.files
             ? `<div class="status-nums">${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>`
             : '';
