@@ -800,6 +800,10 @@ TEMPLATE = r"""<!DOCTYPE html>
       color: var(--muted-foreground);
     }
 
+    .status-state.is-draft {
+      color: var(--foreground);
+    }
+
     .status-state.is-open {
       color: var(--mmds);
     }
@@ -811,7 +815,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     .status-pr {
       margin-top: 0.2rem;
       font-size: 0.75rem;
-      color: var(--foreground);
+      color: var(--muted-foreground);
     }
 
     .status-pr a {
