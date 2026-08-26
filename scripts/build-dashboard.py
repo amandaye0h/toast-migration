@@ -1323,7 +1323,9 @@ TEMPLATE = r"""<!DOCTYPE html>
 
       function prStatusLabel(prs) {
         const labels = [];
-        if (prs.some((p) => prState(p) !== 'MERGED')) labels.push('Drafts');
+        const open = prs.filter((p) => prState(p) !== 'MERGED');
+        if (open.some((p) => p.draft)) labels.push('Draft');
+        if (open.some((p) => !p.draft)) labels.push('In Review');
         if (prs.some((p) => prState(p) === 'MERGED')) labels.push('Merged');
         return labels.join(' · ');
       }
