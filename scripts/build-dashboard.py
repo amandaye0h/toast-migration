@@ -1171,9 +1171,13 @@ TEMPLATE = r"""<!DOCTYPE html>
       return owners.map(ownerLabel).join(' ');
     }
 
+    function prState(pr) {
+      return String(pr?.state || '').toUpperCase();
+    }
+
     function prStatus(pr) {
       if (!pr) return '';
-      const label = pr.draft ? 'Open draft PR' : 'Open PR';
+      const label = prState(pr) === 'MERGED' ? 'Merged PR' : pr.draft ? 'Open draft PR' : 'Open PR';
       const title = pr.title || (pr.number ? `PR #${pr.number}` : label);
       if (pr.url) {
         return `<a class="copy-btn" href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}" aria-label="${esc(label)}">${EXPORT_ICON}</a>`;
@@ -1183,11 +1187,13 @@ TEMPLATE = r"""<!DOCTYPE html>
 
     function prHay(pr) {
       if (!pr) return [];
-      return [pr.draft ? 'draft pr' : 'open pr', String(pr.number || ''), pr.title || ''];
+      const status = prState(pr) === 'MERGED' ? 'merged pr' : pr.draft ? 'draft pr' : 'open pr';
+      return [status, String(pr.number || ''), pr.title || ''];
     }
 
     function prFilterValue(pr) {
       if (!pr) return 'none';
+      if (prState(pr) === 'MERGED') return 'merged';
       return pr.draft ? 'draft' : 'open';
     }
 
@@ -1315,6 +1321,13 @@ TEMPLATE = r"""<!DOCTYPE html>
         return `<a href="${esc(pr.url)}" target="_blank" rel="noreferrer" title="${esc(title)}">${esc(label)}</a>`;
       }
 
+      function prStatusLabel(prs) {
+        const labels = [];
+        if (prs.some((p) => prState(p) !== 'MERGED')) labels.push('Drafts');
+        if (prs.some((p) => prState(p) === 'MERGED')) labels.push('Merged');
+        return labels.join(' · ');
+      }
+
       function cell(stats) {
         if (!stats) return '<span class="status-empty">—</span>';
         const prs = [...(stats.prs || [])].sort((a, b) => (a.number || 0) - (b.number || 0));
@@ -1324,9 +1337,11 @@ TEMPLATE = r"""<!DOCTYPE html>
             ).filter(Boolean).join(' · ')}</div>`
           : '';
         if (!stats.files && !pr) return '<span class="status-empty">—</span>';
-        const nums = stats.files
-          ? `<div class="status-nums">${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>`
-          : '';
+        const nums = prs.length
+          ? `<div class="status-nums">${esc(prStatusLabel(prs))}</div>`
+          : stats.files
+            ? `<div class="status-nums">${stats.calls} call${stats.calls === 1 ? '' : 's'}</div>`
+            : '';
         return `${nums}${pr}`;
       }
 
@@ -1632,6 +1647,7 @@ TEMPLATE = r"""<!DOCTYPE html>
         { value: '', label: 'All' },
         { value: 'draft', label: 'draft' },
         { value: 'open', label: 'open' },
+        { value: 'merged', label: 'merged' },
         { value: 'none', label: 'none' },
       ],
       value: '',
@@ -1723,35 +1739,34 @@ TEMPLATE = r"""<!DOCTYPE html>
 
 
 def fetch_toast_prs(author: str = "amandaye0h", repo: str = "MetaMask/metamask-mobile") -> list[dict]:
-    """Open toast-related PRs for the dashboard author."""
-    try:
-        raw = subprocess.check_output(
-            [
-                "gh",
-                "pr",
-                "list",
-                "--repo",
-                repo,
-                "--author",
-                author,
-                "--state",
-                "open",
-                "--json",
-                "number,title,isDraft,url,files",
-                "--limit",
-                "50",
-            ],
-            text=True,
-            timeout=30,
-        )
-    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-        print(f"Skipping PR status: {exc}")
-        return []
-    return [
-        pr
-        for pr in json.loads(raw)
-        if _is_toast_migration_pr(pr)
-    ]
+    """Open and merged toast-related PRs for the dashboard author."""
+    prs: list[dict] = []
+    for state in ("open", "merged"):
+        try:
+            raw = subprocess.check_output(
+                [
+                    "gh",
+                    "pr",
+                    "list",
+                    "--repo",
+                    repo,
+                    "--author",
+                    author,
+                    "--state",
+                    state,
+                    "--json",
+                    "number,title,isDraft,url,files,state",
+                    "--limit",
+                    "50",
+                ],
+                text=True,
+                timeout=30,
+            )
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            print(f"Skipping {state} PR status: {exc}")
+            continue
+        prs.extend(json.loads(raw))
+    return [pr for pr in prs if _is_toast_migration_pr(pr)]
 
 
 def _is_toast_migration_pr(pr: dict) -> bool:
@@ -1759,8 +1774,13 @@ def _is_toast_migration_pr(pr: dict) -> bool:
     return "migrate" in title and "toast" in title
 
 
+def _pr_sort_key(info: dict) -> tuple:
+    is_open = str(info.get("state", "")).upper() != "MERGED"
+    return (is_open, info.get("number") or 0)
+
+
 def attach_pr_status(inventory: dict, prs: list[dict]) -> None:
-    """Attach open toast PRs onto matching inventory files."""
+    """Attach open and merged toast PRs onto matching inventory files."""
     by_file: dict[str, dict] = {}
     for pr in prs:
         info = {
@@ -1768,13 +1788,14 @@ def attach_pr_status(inventory: dict, prs: list[dict]) -> None:
             "url": pr["url"],
             "title": pr["title"],
             "draft": bool(pr.get("isDraft")),
+            "state": str(pr.get("state") or "OPEN").upper(),
         }
         for file_info in pr.get("files") or []:
             path = file_info.get("path")
             if not path:
                 continue
             existing = by_file.get(path)
-            if existing is None or info["number"] > existing["number"]:
+            if existing is None or _pr_sort_key(info) > _pr_sort_key(existing):
                 by_file[path] = info
 
     attached = 0
