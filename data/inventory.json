@@ -1,12 +1,12 @@
 {
   "sourceRepo": "metamask-mobile",
-  "sourcePath": "/Users/amanda/Documents/metamask-mobile/app",
-  "scannedAt": "2026-08-14T21:59:07",
+  "sourcePath": "/private/tmp/metamask-mobile-scan/app",
+  "scannedAt": "2026-08-26T23:25:41",
   "summary": {
-    "componentLibraryToastFiles": 77,
-    "componentLibraryToastCalls": 104,
+    "componentLibraryToastFiles": 74,
+    "componentLibraryToastCalls": 101,
     "componentLibraryByArea": {
-      "UI/Card": 12,
+      "UI/Card": 13,
       "UI/Predict": 10,
       "UI/Perps": 6,
       "UI/Rewards": 4,
@@ -19,14 +19,10 @@
       "Nav/Main": 2,
       "Views/Notifications": 2,
       "Views/SocialLeaderboard": 2,
-      "UI/AssetOverview": 1,
-      "UI/Assets": 1,
-      "UI/CollectibleDetectionModal": 1,
       "UI/Earn": 1,
       "UI/MarketInsights": 1,
       "UI/Money": 1,
       "UI/QRHardware": 1,
-      "UI/TokenDetails": 1,
       "UI/Transactions": 1,
       "Views/ActivityList": 1,
       "Views/AddressQRCode": 1,
@@ -45,12 +41,15 @@
     "baseNotificationConsumerFiles": 4,
     "baseNotificationProducerFiles": 15,
     "baseNotificationProducerCalls": 23,
-    "mmdsToastFiles": 7,
-    "mmdsToastCalls": 11,
+    "mmdsToastFiles": 11,
+    "mmdsToastCalls": 15,
     "mmdsByArea": {
+      "UI/Assets": 3,
       "Views/MultichainAccounts": 3,
-      "UI/Assets": 2,
       "Views/AddAsset": 1,
+      "UI/AssetOverview": 1,
+      "UI/CollectibleDetectionModal": 1,
+      "UI/TokenDetails": 1,
       "Nav/App": 1
     }
   },
@@ -211,17 +210,17 @@
       "callCount": 3,
       "calls": [
         {
-          "line": 279,
+          "line": 281,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 307,
+          "line": 309,
           "code": "toastRef.current.showToast({",
           "hint": ""
         },
         {
-          "line": 321,
+          "line": 323,
           "code": "toastRef.current.showToast({",
           "hint": ""
         }
@@ -265,17 +264,17 @@
       "callCount": 3,
       "calls": [
         {
-          "line": 225,
+          "line": 217,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 247,
+          "line": 239,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 271,
+          "line": 263,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
@@ -417,12 +416,12 @@
       "callCount": 2,
       "calls": [
         {
-          "line": 580,
+          "line": 619,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         },
         {
-          "line": 593,
+          "line": 632,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
@@ -439,12 +438,12 @@
       "callCount": 2,
       "calls": [
         {
-          "line": 122,
+          "line": 132,
           "code": "showToast(toastConfig);",
           "hint": ""
         },
         {
-          "line": 145,
+          "line": 155,
           "code": "showToast(toastConfig);",
           "hint": ""
         }
@@ -505,12 +504,12 @@
       "callCount": 2,
       "calls": [
         {
-          "line": 1527,
+          "line": 1537,
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         },
         {
-          "line": 1600,
+          "line": 1610,
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         }
@@ -616,37 +615,20 @@
       "codeowners": []
     },
     {
-      "file": "app/components/UI/AssetOverview/TokenDetails/TokenDetailsList/TokenDetailsList.tsx",
-      "area": "UI/AssetOverview",
+      "file": "app/components/UI/Card/Views/CardReportTransaction/CardReportTransaction.tsx",
+      "area": "UI/Card",
       "role": "consumer",
       "via": "import",
       "callCount": 1,
       "calls": [
         {
-          "line": 44,
+          "line": 97,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
       ],
       "codeowners": [
-        "@MetaMask/metamask-assets"
-      ]
-    },
-    {
-      "file": "app/components/UI/Assets/watchlist/components/WatchlistStarButton.tsx",
-      "area": "UI/Assets",
-      "role": "consumer",
-      "via": "import",
-      "callCount": 1,
-      "calls": [
-        {
-          "line": 52,
-          "code": "ToastService.showToast({",
-          "hint": ""
-        }
-      ],
-      "codeowners": [
-        "@MetaMask/metamask-assets"
+        "@MetaMask/card"
       ]
     },
     {
@@ -735,23 +717,6 @@
       ]
     },
     {
-      "file": "app/components/UI/CollectibleDetectionModal/index.tsx",
-      "area": "UI/CollectibleDetectionModal",
-      "role": "consumer",
-      "via": "import",
-      "callCount": 1,
-      "calls": [
-        {
-          "line": 34,
-          "code": "toastRef?.current?.showToast({",
-          "hint": "toast.nft_detection_enabled"
-        }
-      ],
-      "codeowners": [
-        "@MetaMask/metamask-assets"
-      ]
-    },
-    {
       "file": "app/components/UI/Earn/hooks/useEarnToasts.tsx",
       "area": "UI/Earn",
       "role": "consumer",
@@ -776,7 +741,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 29,
+          "line": 35,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
@@ -793,7 +758,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 514,
+          "line": 515,
           "code": "toastRef?.current?.showToast({",
           "hint": "market_insights.feedback_submitted"
         }
@@ -1022,23 +987,6 @@
       ]
     },
     {
-      "file": "app/components/UI/TokenDetails/hooks/useCopyTokenContractAddress.ts",
-      "area": "UI/TokenDetails",
-      "role": "consumer",
-      "via": "import",
-      "callCount": 1,
-      "calls": [
-        {
-          "line": 26,
-          "code": "toastRef?.current?.showToast({",
-          "hint": ""
-        }
-      ],
-      "codeowners": [
-        "@MetaMask/metamask-assets"
-      ]
-    },
-    {
       "file": "app/components/UI/Transactions/index.js",
       "area": "UI/Transactions",
       "role": "consumer",
@@ -1046,7 +994,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 456,
+          "line": 470,
           "code": "ToastService.showToast(getTransactionUpdateErrorToastOptions(error));",
           "hint": ""
         }
@@ -1063,7 +1011,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 115,
+          "line": 116,
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         }
@@ -1110,7 +1058,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 494,
+          "line": 496,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
@@ -1244,7 +1192,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 632,
+          "line": 680,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
@@ -1278,7 +1226,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 141,
+          "line": 142,
           "code": "toastRefStable.current?.current?.showToast(",
           "hint": ""
         }
@@ -1295,7 +1243,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 651,
+          "line": 648,
           "code": "toast?.showToast({",
           "hint": ""
         }
@@ -1327,7 +1275,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 268,
+          "line": 267,
           "code": "toastRef?.current?.showToast(",
           "hint": ""
         }
@@ -1344,7 +1292,7 @@
       "callCount": 1,
       "calls": [
         {
-          "line": 380,
+          "line": 143,
           "code": "toastRef?.current?.showToast({",
           "hint": ""
         }
@@ -1523,7 +1471,7 @@
           "code": "import BaseNotification from '../../../component-library/components-temp/BaseNotification';"
         },
         {
-          "line": 1275,
+          "line": 1349,
           "code": "<BaseNotification"
         }
       ],
@@ -1712,7 +1660,7 @@
       "count": 1,
       "hits": [
         {
-          "line": 329,
+          "line": 358,
           "kind": "simple",
           "title": "",
           "description": "",
@@ -1734,7 +1682,7 @@
       "count": 1,
       "hits": [
         {
-          "line": 321,
+          "line": 322,
           "kind": "simple",
           "title": "",
           "description": "",
@@ -1806,7 +1754,7 @@
         }
       ],
       "codeowners": [
-        "@MetaMask/mobile-platform"
+        "@MetaMask/engagement"
       ]
     },
     {
@@ -1935,19 +1883,19 @@
           "kind": "call"
         },
         {
-          "line": 222,
+          "line": 223,
           "code": "toast({",
           "hint": "price_alerts.delete_success",
           "kind": "call"
         },
         {
-          "line": 231,
+          "line": 233,
           "code": "toast({",
           "hint": "price_alerts.delete_error",
           "kind": "call"
         },
         {
-          "line": 297,
+          "line": 300,
           "code": "toast({",
           "hint": "price_alerts.toggle_error",
           "kind": "call"
@@ -1974,7 +1922,7 @@
           "kind": "call"
         },
         {
-          "line": 80,
+          "line": 81,
           "code": "toast({",
           "hint": "price_alerts.save_error",
           "kind": "call"
@@ -2004,6 +1952,90 @@
           "line": 207,
           "code": "toast({",
           "hint": "collectible.ownership_verification_error_title",
+          "kind": "call"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
+      ]
+    },
+    {
+      "file": "app/components/UI/AssetOverview/TokenDetails/TokenDetailsList/TokenDetailsList.tsx",
+      "area": "UI/AssetOverview",
+      "role": "consumer",
+      "symbols": [
+        "ToastSeverity",
+        "toast"
+      ],
+      "callCount": 1,
+      "calls": [
+        {
+          "line": 38,
+          "code": "toast({",
+          "hint": "account_details.account_copied_to_clipboard",
+          "kind": "call"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
+      ]
+    },
+    {
+      "file": "app/components/UI/Assets/watchlist/components/WatchlistStarButton.tsx",
+      "area": "UI/Assets",
+      "role": "consumer",
+      "symbols": [
+        "ToastSeverity",
+        "toast"
+      ],
+      "callCount": 1,
+      "calls": [
+        {
+          "line": 49,
+          "code": "toast({",
+          "hint": "token_watchlist.removed_from_watchlist",
+          "kind": "call"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
+      ]
+    },
+    {
+      "file": "app/components/UI/CollectibleDetectionModal/index.tsx",
+      "area": "UI/CollectibleDetectionModal",
+      "role": "consumer",
+      "symbols": [
+        "ToastSeverity",
+        "toast"
+      ],
+      "callCount": 1,
+      "calls": [
+        {
+          "line": 26,
+          "code": "toast({",
+          "hint": "toast.nft_detection_enabled",
+          "kind": "call"
+        }
+      ],
+      "codeowners": [
+        "@MetaMask/metamask-assets"
+      ]
+    },
+    {
+      "file": "app/components/UI/TokenDetails/hooks/useCopyTokenContractAddress.ts",
+      "area": "UI/TokenDetails",
+      "role": "consumer",
+      "symbols": [
+        "ToastSeverity",
+        "toast"
+      ],
+      "callCount": 1,
+      "calls": [
+        {
+          "line": 18,
+          "code": "toast({",
+          "hint": "account_details.account_copied_to_clipboard",
           "kind": "call"
         }
       ],
@@ -2081,7 +2113,7 @@
       "callCount": 0,
       "calls": [
         {
-          "line": 1504,
+          "line": 1577,
           "code": "<Toaster />",
           "hint": "",
           "kind": "host"
